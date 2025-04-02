@@ -52,18 +52,75 @@ These instructions will get you a copy of the project up and running on your loc
 
 ### Prerequisites
 
-What things you need to install the software and how to install them.
+`Terraform` is required to install.
+
+1. **Download the Terraform Binary**
+```
+wget https://releases.hashicorp.com/terraform/1.6.4/terraform_1.6.4_linux_amd64.zip
+```
+
+2. **Unzip and Install**
+```bash
+sudo unzip terraform_*.zip -d /usr/local/bin/
 
 ```
-Give examples
+
+3. **Set Execute Permissions**
+
+```bash
+
+sudo chmod +x /usr/local/bin/terraform
+
+```
+
+**Verify Installation:**
+
+```bash
+
+terraform --version
+
 ```
 
 ## 🎈 Usage <a name="usage"></a>
 
 ```
+git clone https://github.com/easycodesnipper/terraform-kvm-provisioner.git
+cd terraform-kvm-provisioner
 terraform init
+```
+**Provision virtual machines on local KVM host**
+- **`NAT` mode**
+```
 terraform apply
 ```
+- **`NAT` mode apparently**
+```
+terraform apply -var-file=nat.auto.tfvars
+```
+- **`Bridge` mode**
+```
+terraform apply -var-file=bridge.auto.tfvars
+```
+
+**Provision virtual machines on remote KVM host**
+
+- **`NAT` mode**
+```
+terraform apply -var-file=<(cat remote.auto.tfvars nat.auto.tfvars) # NAT mode remotely install
+```
+
+- **`Bridge` mode**
+```
+terraform apply -var-file=<(cat remote.auto.tfvars bridge.auto.tfvars)
+```
+
+- **Override available variables**
+```
+terraform apply -var="vm_count=3" \
+-var="vcpu_counts=[1, 2, 2]" \
+-var='vm_os=["ubuntu", "debian", "fedora"]'
+```
+For more available variables, refer to [variables.tf](./variables.tf)
 
 ## ✍️ Authors <a name = "authors"></a>
 
