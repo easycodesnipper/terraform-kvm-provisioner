@@ -302,5 +302,5 @@ variable "vm_custom_commands" {
 variable "debug_enabled" {
   description = "Flag to be used to debug"
   type        = bool
-  default     = true
+  default     = false
 }
