@@ -1,0 +1,18 @@
+# network-config.yml
+version: 2
+ethernets:
+  ${interface_name}:
+    match:
+      macaddress: "${mac_address}"
+    set-name: ${interface_name}
+%{ if dhcp_enabled ~}
+    dhcp4: true
+    dhcp-identifier: mac
+%{ else ~}
+    addresses: [${static_ip}/24]
+    routes:
+      - to: default
+        via: ${gateway_ip}
+    nameservers:
+      addresses: ${jsonencode(dns_servers)}
+%{ endif ~}
