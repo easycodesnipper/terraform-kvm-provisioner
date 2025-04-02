@@ -8,8 +8,8 @@
 <div align="center">
 
 [![Status](https://img.shields.io/badge/status-active-success.svg)]()
-[![GitHub Issues](https://img.shields.io/github/issues/kylelobo/The-Documentation-Compendium.svg)](https://github.com/kylelobo/The-Documentation-Compendium/issues)
-[![GitHub Pull Requests](https://img.shields.io/github/issues-pr/kylelobo/The-Documentation-Compendium.svg)](https://github.com/kylelobo/The-Documentation-Compendium/pulls)
+[![GitHub Issues](https://img.shields.io/github/issues/easycodesnipper/terraform-kvm-provisioner.svg)](https://github.com/easycodesnipper/terraform-kvm-provisioner/issues)
+[![GitHub Pull Requests](https://img.shields.io/github/issues-pr/easycodesnipper/terraform-kvm-provisioner.svg)](https://github.com/easycodesnipper/terraform-kvm-provisioner/pulls)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](/LICENSE)
 
 </div>
@@ -34,17 +34,17 @@
 This project automates the provisioning of **KVM (Kernel-based Virtual Machine) virtual machines** using Terraform (Infrastructure as Code), supporting multi-OS deployments with flexible networking configurations.
 
 ### Key Features
-- **Multi-VM Provisioning**  
-  Deploy multiple virtual machines simultaneously with customized resources (CPU, RAM, disk).
-- **Cross-OS Support**  
-  Provision Ubuntu, Debian, Fedora, Rocky Linux, and other distributions in the same environment.
-- **Dual Networking Modes**  
-  - **NAT**: For isolated VMs with outbound internet access
-  - **Bridge**: Direct LAN integration for production-like environments
-- **Infrastructure as Code**  
-  Version-controlled VM configurations with Terraform's declarative syntax.
-- **Cloud-Init Integration**  
-  Automate initial setup including user accounts, SSH keys, network and package installation.
+- **✅Multi-VM Provisioning**  
+  Deploy multiple virtual machines with customized resources (CPU, RAM, disk) in a single operation
+- **✅Cross-OS Support**  
+  Simultaneously provision Ubuntu, Debian, Fedora, and other distributions
+- **✅Dual Networking Modes**  
+  🛡️ **NAT** - Isolated VMs with outbound internet access  
+  🌉 **Bridge** - Direct LAN connectivity for production-like networking
+- **✅Infrastructure as Code**  
+  Version-controlled configurations using Terraform's declarative syntax
+- **✅Cloud-Init Integration**  
+  Automated instance initialization (users, SSH keys, packages)
 
 ## 🏁 Getting Started <a name = "getting_started"></a>
 
@@ -104,9 +104,17 @@ terraform apply -var-file=bridge.auto.tfvars
 
 **Provision virtual machines on remote KVM host**
 
+*Ensure SSH connection works fine between local and remote KVM host*
+```shell
+ssh-keygen
+ssh-copy-id -i ~/.ssh/id_rsa.pub <kvm_user>@<kvm_host>
+# Test ssh connection
+ssh <kvm_user>@<kvm_host> hostname
+```
+
 - **`NAT` mode**
 ```
-terraform apply -var-file=<(cat remote.auto.tfvars nat.auto.tfvars) # NAT mode remotely install
+terraform apply -var-file=<(cat remote.auto.tfvars nat.auto.tfvars)
 ```
 
 - **`Bridge` mode**
@@ -114,13 +122,14 @@ terraform apply -var-file=<(cat remote.auto.tfvars nat.auto.tfvars) # NAT mode r
 terraform apply -var-file=<(cat remote.auto.tfvars bridge.auto.tfvars)
 ```
 
-- **Override available variables**
+**Override available variables**
 ```
 terraform apply -var="vm_count=3" \
 -var="vcpu_counts=[1, 2, 2]" \
 -var='vm_os=["ubuntu", "debian", "fedora"]'
 ```
-For more available variables, refer to [variables.tf](./variables.tf)
+
+*For more available variables, refer to [variables.tf](./variables.tf) definition*
 
 ## ✍️ Authors <a name = "authors"></a>
 
