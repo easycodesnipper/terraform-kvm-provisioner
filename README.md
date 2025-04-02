@@ -73,7 +73,7 @@ sudo chmod +x /usr/local/bin/terraform
 
 ```
 
-**Verify Installation:**
+4. **Verify Installation:**
 
 ```bash
 
