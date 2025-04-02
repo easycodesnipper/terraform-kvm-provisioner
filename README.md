@@ -55,7 +55,7 @@ These instructions will get you a copy of the project up and running on your loc
 `Terraform` is required to install.
 
 1. **Download the Terraform Binary**
-```
+```bash
 wget https://releases.hashicorp.com/terraform/1.6.4/terraform_1.6.4_linux_amd64.zip
 ```
 
@@ -83,29 +83,29 @@ terraform --version
 
 ## 🎈 Usage <a name="usage"></a>
 
-```
+```bash
 git clone https://github.com/easycodesnipper/terraform-kvm-provisioner.git
 cd terraform-kvm-provisioner
 terraform init
 ```
-**Provision virtual machines on local KVM host**
+### Provision virtual machines on local KVM host
 - **`NAT` mode**
-```
+```bash
 terraform apply
 ```
 - **`NAT` mode apparently**
-```
+```bash
 terraform apply -var-file=nat.auto.tfvars
 ```
 - **`Bridge` mode**
-```
+```bash
 terraform apply -var-file=bridge.auto.tfvars
 ```
 
-**Provision virtual machines on remote KVM host**
+### Provision virtual machines on remote KVM host
 
-*Ensure SSH connection works fine between local and remote KVM host*
-```shell
+`Ensure SSH connection works fine between local and remote KVM host`
+```bash
 ssh-keygen
 ssh-copy-id -i ~/.ssh/id_rsa.pub <kvm_user>@<kvm_host>
 # Test ssh connection
@@ -113,17 +113,19 @@ ssh <kvm_user>@<kvm_host> hostname
 ```
 
 - **`NAT` mode**
-```
-terraform apply -var-file=<(cat remote.auto.tfvars nat.auto.tfvars)
+```bash
+terraform apply -var='libvirt_uri="qemu+ssh://<kvm_user>@<kvm_host>/system"' -var="network_mode=nat"
+or
+terraform apply -var-file=<(cat remote.auto.tfvars nat.auto.tfvars) # need to edit remote.auto.tfvars
 ```
 
 - **`Bridge` mode**
-```
+```bash
 terraform apply -var-file=<(cat remote.auto.tfvars bridge.auto.tfvars)
 ```
 
-**Override available variables**
-```
+### Override available variables
+```bash
 terraform apply -var="vm_count=3" \
 -var="vcpu_counts=[1, 2, 2]" \
 -var='vm_os=["ubuntu", "debian", "fedora"]'
