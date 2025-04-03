@@ -101,10 +101,20 @@ terraform apply -var-file=bridge.tfvars
 
 `Ensure SSH connection works fine between local and remote KVM host`
 ```bash
+# Generate ssh keys
 ssh-keygen
+
+# Copy ssh public key to remote
 ssh-copy-id -i ~/.ssh/id_rsa.pub <kvm_user>@<kvm_host>
+
 # Test ssh connection
 ssh <kvm_user>@<kvm_host> hostname
+
+# Start ssh agent
+eval $(ssh-agent)
+
+# Add ssh private key
+ssh-add ~/.ssh/id_rsa
 ```
 
 - **`NAT` mode**
