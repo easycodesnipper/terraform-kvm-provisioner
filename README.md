@@ -128,6 +128,20 @@ terraform apply -var="vm_count=3" \
 
 *For more available variables, refer to [variables.tf](./variables.tf) definition*
 
+### Alternatively running in docker
+```bash
+# Build docker image
+docker build \
+--build-arg USER_ID=$(id -u) \
+--build-arg GROUP_ID=$(id -g) \
+-t terraform-kvm-provisioner .
+
+# Docker run
+docker run -it --rm -v $(pwd):/app \
+-v ~/.ssh:/home/tfuser/.ssh \
+terraform-kvm-provisioner apply
+```
+
 ## ✍️ Authors <a name = "authors"></a>
 
 - [@easycodesnipper](https://github.com/easycodesnipper) - Idea & Initial work
