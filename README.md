@@ -3,7 +3,8 @@
  <img width=200px height=200px src="./images/logo.jpeg" alt="TKP"></a>
 </p>
 
-<h3 align="center">Terraform KVM Provisioner (TKP)</h3>
+# Terraform KVM Provisioner (TKP)
+**Terraform(Infrastructure as Code) to provison KVM virtual machines.**
 
 <div align="center">
 
@@ -13,12 +14,6 @@
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](/LICENSE)
 
 </div>
-
----
-
-<p align="center"> Terraform to provison KVM virtual machines.
-    <br> 
-</p>
 
 ## 📝 Table of Contents
 
