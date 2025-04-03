@@ -121,6 +121,8 @@ ssh-add ~/.ssh/id_rsa
 ```bash
 terraform apply -var='libvirt_uri="qemu+ssh://<kvm_user>@<kvm_host>/system"' -var="network_mode=nat"
 or
+terraform apply -var-file=nat.tfvars -var='libvirt_uri="qemu+ssh://<kvm_user>@<kvm_host>/system"'
+or
 terraform apply -var-file=<(cat remote.tfvars nat.tfvars) # need to edit remote.tfvars
 ```
 
