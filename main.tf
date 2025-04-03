@@ -18,7 +18,8 @@ resource "libvirt_domain" "vm" {
     network_id     = libvirt_network.vm_network.id
     hostname       = "${var.vm_hostname_prefix}-${count.index}"
     mac            = local.vm_mac_addresses[count.index]
-    wait_for_lease = true
+    wait_for_lease = var.network_mode == "nat" ? true : false
+    addresses      = var.network_mode == "bridge" ? [local.final_static_ips[count.index]] : null
   }
 
   disk {

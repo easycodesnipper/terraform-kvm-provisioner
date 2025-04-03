@@ -6,12 +6,13 @@ variable "libvirt_uri" {
     Libvirt connection URI. Examples:
     - Local: "qemu:///system"
     - Remote SSH: "qemu+ssh://user@host.example.com/system"
+    - Remote TCP: "qemu+tcp://host.example.com/system"
     - Remote TLS: "qemu+tls://host.example.com/system"
   EOT
   type        = string
   default     = "qemu:///system" # Default to local connection
   validation {
-    condition     = can(regex("^(qemu\\+?(ssh|tcp|tls))?://.*", var.libvirt_uri))
+    condition     = can(regex("^qemu(\\+ssh|\\+tcp|\\+tls)?://.*", var.libvirt_uri))
     error_message = "Invalid Libvirt URI format. Use qemu://, qemu+ssh://, qemu+tcp://, or qemu+tls://"
   }
 }
@@ -215,6 +216,10 @@ variable "vm_os" {
   description = "List of OS types for each VM (empty = use first available base image)"
   type        = list(string)
   default     = [] # Empty by default
+  validation {
+    condition     = length(var.vm_os) >= var.vm_count
+    error_message = "If vm_os is provided, the number must match vm_count (${var.vm_count})."
+  }
 }
 
 variable "vm_base_images" {

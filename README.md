@@ -90,11 +90,11 @@ terraform apply
 ```
 - **`NAT` mode apparently**
 ```bash
-terraform apply -var-file=nat.auto.tfvars
+terraform apply -var-file=nat.tfvars
 ```
 - **`Bridge` mode**
 ```bash
-terraform apply -var-file=bridge.auto.tfvars
+terraform apply -var-file=bridge.tfvars
 ```
 
 ### Provision virtual machines on remote KVM host
@@ -111,12 +111,12 @@ ssh <kvm_user>@<kvm_host> hostname
 ```bash
 terraform apply -var='libvirt_uri="qemu+ssh://<kvm_user>@<kvm_host>/system"' -var="network_mode=nat"
 or
-terraform apply -var-file=<(cat remote.auto.tfvars nat.auto.tfvars) # need to edit remote.auto.tfvars
+terraform apply -var-file=<(cat remote.tfvars nat.tfvars) # need to edit remote.tfvars
 ```
 
 - **`Bridge` mode**
 ```bash
-terraform apply -var-file=<(cat remote.auto.tfvars bridge.auto.tfvars)
+terraform apply -var-file=<(cat remote.tfvars bridge.tfvars)
 ```
 
 ### Override available variables

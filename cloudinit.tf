@@ -17,7 +17,7 @@ resource "libvirt_cloudinit_disk" "vm_init" {
     interface_name = var.vm_interface != "" ? var.vm_interface : "eth${count.index}"
     mac_address    = local.vm_mac_addresses[count.index]
     dhcp_enabled   = var.network_mode == "nat" ? true : var.dhcp_enabled
-    static_ip      = length(var.static_ips) > 0 ? var.static_ips[count.index] : cidrhost(var.bridge_network_cidr, var.static_ip_start + count.index)
+    static_ip      = local.final_static_ips[count.index]
     gateway_ip     = var.gateway_ip
     dns_servers    = var.dns_servers
   })
