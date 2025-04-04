@@ -238,7 +238,7 @@ variable "vm_base_images" {
       format = "qcow2"
     },
     fedora = {
-      uri    = "https://download.fedoraproject.org/pub/fedora/linux/releases/38/Cloud/x86_64/images/Fedora-Cloud-Base-38-1.6.x86_64.qcow2"
+      uri    = "https://dl.fedoraproject.org/pub/fedora/linux/releases/41/Cloud/x86_64/images/Fedora-Cloud-Base-Generic-41-1.4.x86_64.qcow2"
       format = "qcow2"
     }
   }

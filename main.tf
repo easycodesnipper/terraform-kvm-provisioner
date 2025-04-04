@@ -11,15 +11,14 @@ resource "libvirt_domain" "vm" {
   cloudinit = libvirt_cloudinit_disk.vm_init[count.index].id
 
   timeouts {
-    create = var.vm_create_timeout # time for lease + boot
+    create = var.vm_create_timeout # time for (lease + boot)
   }
 
   network_interface {
     network_id     = libvirt_network.vm_network.id
     hostname       = "${var.vm_hostname_prefix}-${count.index}"
     mac            = local.vm_mac_addresses[count.index]
-    wait_for_lease = var.network_mode == "nat" ? true : false
-    addresses      = var.network_mode == "bridge" ? [local.final_static_ips[count.index]] : null
+    wait_for_lease = true
   }
 
   disk {
