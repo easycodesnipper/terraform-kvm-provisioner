@@ -1,45 +1,30 @@
-resource "libvirt_domain" "vm" {
-  count  = var.vm_count
-  name   = "${var.vm_hostname_prefix}-${count.index}"
-  memory = local.final_memory_in_mb[count.index]
-  vcpu   = local.final_vcpu_counts[count.index]
-
-  cpu {
-    mode = var.cpu_mode
+terraform {
+  required_version = ">= 1.0"
+  required_providers {
+    libvirt = {
+      source  = "dmacvicar/libvirt"
+      version = "0.8.3"
+    }
   }
+}
 
-  cloudinit = libvirt_cloudinit_disk.vm_init[count.index].id
+provider "libvirt" {
+  alias = "kvm" # Must match a key in your var.kvm_host_vm_instances
+  uri   = var.libvirt_uri
+}
 
-  timeouts {
-    create = var.vm_create_timeout # time for (lease + boot)
+module "kvm" {
+  source = "./modules/kvm"
+  providers = {
+    libvirt = libvirt.kvm # Static reference to one of your provider aliases
   }
-
-  network_interface {
-    network_id     = libvirt_network.vm_network.id
-    hostname       = "${var.vm_hostname_prefix}-${count.index}"
-    mac            = local.vm_mac_addresses[count.index]
-    wait_for_lease = true
-  }
-
-  disk {
-    volume_id = libvirt_volume.boot_disk[count.index].id
-  }
-
-  disk {
-    volume_id = libvirt_volume.data_disk[count.index].id
-  }
-
-  graphics {
-    type        = "spice"
-    listen_type = "address"
-    autoport    = true
-  }
-
-  console {
-    type        = "pty"
-    target_port = "0"
-    target_type = "serial"
-  }
-
-  qemu_agent = var.network_mode == "bridge" ? true : false
+  kvm_host            = var.kvm_host
+  vm_instances        = var.vm_instances
+  os_images           = var.os_images
+  ssh_public_key_path = var.ssh_public_key_path
+  install_packages    = var.install_packages
+  package_upgrade     = var.package_upgrade
+  timezone            = var.timezone
+  mac_prefix          = var.mac_prefix
+  debug_enabled       = var.debug_enabled
 }

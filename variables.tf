@@ -1,311 +1,232 @@
-###
-### Provider Variables
-###
-variable "libvirt_uri" {
-  description = <<-EOT
-    Libvirt connection URI. Examples:
-    - Local: "qemu:///system"
-    - Remote SSH: "qemu+ssh://user@host.example.com/system"
-    - Remote TCP: "qemu+tcp://host.example.com/system"
-    - Remote TLS: "qemu+tls://host.example.com/system"
-  EOT
-  type        = string
-  default     = "qemu:///system" # Default to local connection
-  validation {
-    condition     = can(regex("^qemu(\\+ssh|\\+tcp|\\+tls)?://.*", var.libvirt_uri))
-    error_message = "Invalid Libvirt URI format. Use qemu://, qemu+ssh://, qemu+tcp://, or qemu+tls://"
-  }
-}
-
-###
-### Storage Variables
-###
-variable "storage_pool_name" {
-  description = "Name of the storage pool"
-  type        = string
-  default     = "vm-pool"
-}
-
-variable "storage_pool_path" {
-  description = "Path for directory-based storage pools"
-  type        = string
-  default     = "/var/lib/libvirt/images/vm-pool"
-}
-
-variable "storage_pool_type" {
-  description = "Type of storage pool"
-  type        = string
-  default     = "dir"
-}
-
-variable "boot_disk_in_gb" {
-  description = "OS disk size in GB"
-  type        = number
-  default     = 10
-}
-
-variable "data_disk_in_gb" {
-  description = "Data disk size in GB"
-  type        = number
-  default     = 20
-}
-
-###
-### Network Variables
-###
-variable "network_mode" {
-  description = "Network mode (bridge or nat)"
-  type        = string
-  default     = "nat"
-  validation {
-    condition     = contains(["bridge", "nat"], var.network_mode)
-    error_message = "Must be either 'bridge' or 'nat'"
-  }
-}
-
-variable "network_name" {
-  description = "Network name"
-  type        = string
-  default     = "vm-net"
-}
-
-variable "bridge_interface" {
-  description = "Physical host bridge interface (e.g., br0)"
-  type        = string
-  default     = "br0"
-  validation {
-    condition     = var.network_mode != "bridge" || (var.bridge_interface != "" && can(regex("^[a-z0-9]+$", var.bridge_interface)))
-    error_message = "Bridge mode requires valid interface name (e.g., br0)"
-  }
-}
-
-variable "bridge_network_cidr" {
-  description = "Physical network CIDR (e.g., 192.168.4.0/24)"
-  type        = string
-  default     = "192.168.4.0/24"
-  validation {
-    condition     = var.network_mode != "bridge" || can(cidrhost(var.bridge_network_cidr, 0))
-    error_message = "Valid CIDR required for bridge mode"
-  }
-}
-
-variable "gateway_ip" {
-  description = "Default gateway IP for bridge mode"
-  type        = string
-  default     = "192.168.4.1"
-  validation {
-    condition     = var.network_mode != "bridge" || (var.gateway_ip != "" && can(regex("^([0-9]{1,3}\\.){3}[0-9]{1,3}$", var.gateway_ip)))
-    error_message = "Valid IPv4 gateway required for bridge mode"
-  }
-}
-
-variable "static_ips" {
-  description = "List of static IPs to assign to VMs. If provided, must match vm_count in length."
-  type        = list(string)
-  default     = [] # Empty list means use calculated IPs
-  validation {
-    condition     = var.network_mode != "bridge" || length(var.static_ips) >= var.vm_count
-    error_message = "If static_ips is provided, the number of IPs must match vm_count (${var.vm_count})."
-  }
-}
-
-variable "static_ip_start" {
-  description = "Starting IP offset for static assignment"
-  type        = number
-  default     = 100
-  validation {
-    condition     = var.network_mode != "bridge" || (var.static_ip_start >= 2 && var.static_ip_start <= 253)
-    error_message = "Static IP must be between 2-253"
-  }
-}
-
-variable "dns_servers" {
-  description = "Upstream DNS servers"
-  type        = list(string)
-  default     = ["8.8.8.8", "8.8.4.4"]
-  validation {
-    condition     = alltrue([for ip in var.dns_servers : can(regex("^([0-9]{1,3}\\.){3}[0-9]{1,3}$", ip))])
-    error_message = "All DNS servers must be valid IPv4 addresses"
-  }
-}
-
-variable "dhcp_enabled" {
-  type        = bool
-  default     = false
-  description = "Disable DHCP (for bridge mode)"
-}
-
-## NAT Mode Variables
-variable "nat_network_cidr" {
-  description = "NAT network CIDR range"
-  type        = string
-  default     = "10.17.3.0/24"
-  validation {
-    condition     = var.network_mode != "nat" || can(cidrhost(var.nat_network_cidr, 0))
-    error_message = "Valid CIDR required for NAT mode"
-  }
-}
-
-variable "dns_enabled" {
-  type        = bool
-  default     = true
-  description = "Enable DNS (for nat mode)"
-}
-
-variable "dns_local_only" {
-  type        = bool
-  default     = true
-  description = "Restrict DNS to local network"
-}
-
-###
-### Compute Variables
-###
-variable "vcpu_counts" {
-  description = "Array of vCPU counts for each VM"
-  type        = list(number)
-  default     = [] # Empty array means "use defaults"
-  validation {
-    condition = alltrue([
-      for c in var.vcpu_counts : c > 0 && c <= 32 # Adjust max as needed
-    ])
-    error_message = "Each vCPU count must be between 1 and 32."
-  }
-  validation {
-    condition     = length(var.vcpu_counts) >= var.vm_count
-    error_message = "If vcpu_counts is provided, the number must match vm_count (${var.vm_count})."
-  }
-}
-
-variable "memory_in_mb" {
-  description = "Array of memory allocation in MB for each VM"
-  type        = list(number)
-  default     = [] # Empty array means "use defaults"
-  validation {
-    condition = alltrue([
-      for m in var.memory_in_mb : m >= 512 && m <= 65536 # 512MB min, 64GB max
-    ])
-    error_message = "Each memory value must be between 512 and 65536 MB."
-  }
-  validation {
-    condition     = length(var.memory_in_mb) >= var.vm_count
-    error_message = "If memory_in_mb is provided, the number must match vm_count (${var.vm_count})."
-  }
-}
-
-variable "cpu_mode" {
-  description = "CPU mode"
-  type        = string
-  default     = "host-passthrough"
-}
-
-###
-### VirtualMachine Variables
-###
-variable "vm_count" {
-  description = "Number of VMs to create"
-  type        = number
-  default     = 3
-  validation {
-    condition     = var.vm_count > 0
-    error_message = "VM count must be at least 1."
-  }
-}
-
-variable "vm_os" {
-  description = "List of OS types for each VM (empty = use first available base image)"
-  type        = list(string)
-  default     = [] # Empty by default
-  validation {
-    condition     = length(var.vm_os) >= var.vm_count
-    error_message = "If vm_os is provided, the number must match vm_count (${var.vm_count})."
-  }
-}
-
-variable "vm_base_images" {
-  description = "Map of OS names to their base image configurations"
-  type = map(object({
-    uri    = string
-    format = string
-  }))
-  default = {
-    ubuntu = {
-      uri    = "https://cloud-images.ubuntu.com/jammy/current/jammy-server-cloudimg-amd64.img"
-      format = "qcow2"
-    },
-    debian = {
-      uri    = "https://cloud.debian.org/images/cloud/bookworm/latest/debian-12-genericcloud-amd64.qcow2"
-      format = "qcow2"
-    },
-    fedora = {
-      uri    = "https://dl.fedoraproject.org/pub/fedora/linux/releases/41/Cloud/x86_64/images/Fedora-Cloud-Base-Generic-41-1.4.x86_64.qcow2"
-      format = "qcow2"
-    }
-  }
-}
-
-variable "vm_create_timeout" {
-  description = "Timeout to wait for vm creation (for lease + boot)"
-  type        = string
-  default     = "10m"
-}
-
-variable "vm_domain" {
-  description = "Domain name of VM"
-  type        = string
-  default     = "vm.local"
-}
-
-variable "vm_mac_format" {
-  description = "Mac address format of VM"
-  type        = string
-  default     = "52:54:00:%02x:%02x:%02x"
-}
-
-variable "vm_interface" {
-  description = "Network interface name of VM"
-  type        = string
-  default     = ""
-}
-
-variable "vm_hostname_prefix" {
-  description = "Prefix for VM hostnames"
-  type        = string
-  default     = "vm"
-}
-
-variable "vm_username" {
-  description = "Default username for the VMs"
-  type        = string
-  default     = "user"
-}
-
-variable "ssh_public_key_path" {
-  description = "Path to the SSH public key file"
-  type        = string
-  default     = "~/.ssh/id_rsa.pub"
-}
-
-variable "vm_packages" {
-  description = "Additional packages to install"
-  type        = list(string)
-  default     = []
-}
-
-variable "vm_timezone" {
-  description = "Timezone to configure"
+variable "timezone" {
+  description = "System timezone configuration using tz database format"
   type        = string
   default     = "UTC"
 }
 
-variable "vm_custom_commands" {
-  description = "Custom commands to run"
+variable "ssh_public_key_path" {
+  description = "Local filesystem path to SSH public key for VM access"
+  type        = string
+  default     = "~/.ssh/id_rsa.pub" # Defaults to standard key location
+}
+
+variable "install_packages" {
+  description = "List of additional system packages to install during provisioning"
   type        = list(string)
-  default     = []
+  default     = ["qemu-guest-agent"]
+}
+
+variable "package_upgrade" {
+  description = "Whether to upgrade os in cloud init"
+  type        = bool
+  default     = false
+}
+
+variable "mac_prefix" {
+  type    = list(number)
+  default = [170, 0, 4]
 }
 
 variable "debug_enabled" {
-  description = "Flag to be used to debug"
+  description = "Enable verbose debugging output and preserve temporary resources"
   type        = bool
-  default     = false
+  default     = true
+}
+
+variable "libvirt_uri" {
+  description = <<-EOT
+  [Required] Libvirt connection URI for KVM hypervisor management.
+  Format: qemu+ssh://<user>@<host>:[port]/system
+  Default: "qemu+ssh://user@localhost:22/system" (local libvirt connection)
+  Example for remote host: "qemu+ssh://admin@kvm01.example.com/system"
+  EOT
+  type        = string
+  default     = "qemu:///system"
+}
+
+variable "kvm_host" {
+  description = <<-EOT
+  [Required] Configuration object for KVM host infrastructure
+  Default: Creates basic storage pool with NAT and bridge networks
+  EOT
+  type = object({
+    pool = object({
+      name = string
+      type = string
+      path = string
+    })
+    networks = list(object({
+      name             = string
+      mode             = string
+      cidr             = list(string)
+      domain           = optional(string)
+      bridge_interface = optional(string)
+      autostart        = optional(bool, false)
+    }))
+  })
+  default = {
+    pool = {
+      name = "vm_pool"
+      type = "dir"
+      path = "/var/lib/libvirt/images/vm_pool"
+    }
+    networks = [
+      # NAT network for internal connectivity
+      {
+        name   = "vm_nat"
+        mode   = "nat"
+        cidr   = ["10.0.1.0/24"]
+        domain = "local.lan"
+      },
+      # Bridge network for external connectivity
+      {
+        name             = "vm_bridge"
+        mode             = "bridge"
+        cidr             = ["192.168.4.0/24"]
+        bridge_interface = "br0" # Update with your physical interface
+      }
+    ]
+  }
+}
+
+variable "os_images" {
+  description = "OS images"
+  type = map(object({
+    uri     = string
+    format  = string
+    os_type = string # windows/linux/android
+  }))
+
+  default = {
+    ubuntu2204 = {
+      uri     = "https://cloud-images.ubuntu.com/jammy/current/jammy-server-cloudimg-amd64.img"
+      format  = "qcow2"
+      os_type = "linux"
+    },
+
+    debian12 = {
+      uri     = "https://cloud.debian.org/images/cloud/bookworm/latest/debian-12-genericcloud-amd64.qcow2"
+      format  = "qcow2"
+      os_type = "linux"
+    },
+
+    fedora41 = {
+      uri     = "https://dl.fedoraproject.org/pub/fedora/linux/releases/41/Cloud/x86_64/images/Fedora-Cloud-Base-Generic-41-1.4.x86_64.qcow2"
+      format  = "qcow2"
+      os_type = "linux"
+    }
+  }
+}
+
+variable "vm_instances" {
+  description = <<-EOT
+  [Required] List of virtual machine configurations
+  Default: Creates a basic Ubuntu VM with dual network interfaces
+  EOT
+  type = list(object({
+    name     = string
+    hostname = string
+    domain   = optional(string)
+    username = string
+
+    compute_spec = object({
+      cpu_cores    = number
+      memory_gb    = number
+      cpu_mode     = optional(string, "host-passthrough")
+      architecture = optional(string, "x86_64")
+      gpu_enabled  = optional(bool, false)
+      gpu_type     = optional(string)
+    })
+
+    storage_spec = object({
+      os_disk = object({
+        # os_image = object({
+        #   uri     = string
+        #   format  = string
+        #   os_type = string # windows/linux/android
+        # })
+        os_image = string
+        size_gb  = number
+        type     = optional(string, "ssd")
+      })
+
+      data_disks = optional(list(object({
+        size_gb     = number
+        mount_point = string
+        filesystem  = optional(string, "ext4")
+      })), [])
+    })
+
+    network_spec = object({
+      interfaces = list(object({
+        name         = string
+        mac_address  = optional(string)
+        ipv4_address = optional(string)
+        ipv6_address = optional(string)
+        cidr_block   = optional(number, 24)
+        gateway      = optional(string)
+        dns_servers  = optional(list(string))
+        network_name = string
+      }))
+    })
+
+    qemu_agent = optional(bool, true)
+    autostart  = optional(bool, false)
+  }))
+
+  default = [
+    {
+      name     = "vm"
+      hostname = "ubuntu-server"
+      domain   = "local.lan"
+      username = "ubuntu"
+
+      compute_spec = {
+        cpu_cores    = 2
+        memory_gb    = 2
+        cpu_mode     = "host-passthrough"
+        architecture = "x86_64"
+        gpu_enabled  = false
+      }
+
+      storage_spec = {
+        os_disk = {
+          os_image = "ubuntu2204"
+          size_gb  = 20
+          type     = "ssd"
+        }
+        data_disks = [
+          {
+            size_gb     = 10
+            mount_point = "/mnt/disk0"
+          },
+          {
+            size_gb     = 20
+            mount_point = "/mnt/disk1"
+          },
+
+        ]
+      }
+
+      network_spec = {
+        interfaces = [
+          # NAT interface for management
+          {
+            name = "eth0",
+            # mac_address  = "52:54:00:ab:cd:ef",
+            network_name = "vm_nat" # aligned with kvm_host.networks.name above
+          },
+          # Bridge interface for external access
+          {
+            name = "eth1",
+            # mac_address  = "52:54:00:12:34:56",
+            ipv4_address = "192.168.4.201"
+            gateway      = "192.168.4.1",
+            dns_servers  = ["8.8.8.8", "8.8.4.4"]
+            network_name = "vm_bridge"
+          }
+        ]
+      }
+    }
+  ]
 }

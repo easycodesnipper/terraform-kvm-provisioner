@@ -84,18 +84,10 @@ cd terraform-kvm-provisioner
 terraform init
 ```
 ### Provision virtual machines on local KVM host
-- **`NAT` mode**
 ```bash
 terraform apply
 ```
-- **`NAT` mode apparently**
-```bash
-terraform apply -var-file=nat.tfvars
-```
-- **`Bridge` mode**
-```bash
-terraform apply -var-file=bridge.tfvars
-```
+
 
 ### Provision virtual machines on remote KVM host
 
@@ -115,29 +107,29 @@ eval $(ssh-agent)
 
 # Add ssh private key
 ssh-add ~/.ssh/id_rsa
-```
 
-- **`NAT` mode**
 ```bash
-terraform apply -var='libvirt_uri="qemu+ssh://<kvm_user>@<kvm_host>/system"' -var="network_mode=nat"
-or
-terraform apply -var-file=nat.tfvars -var='libvirt_uri="qemu+ssh://<kvm_user>@<kvm_host>/system"'
-or
-terraform apply -var-file=<(cat remote.tfvars nat.tfvars) # need to edit remote.tfvars
-```
+terraform apply -var='libvirt_uri="qemu+ssh://<kvm_user>@<kvm_host>:22/system"'
 
-- **`Bridge` mode**
-```bash
-terraform apply -var-file=<(cat remote.tfvars bridge.tfvars)
 ```
 
 ### Override available variables
 ```bash
-terraform apply -var="vm_count=3" \
--var="vcpu_counts=[1, 2, 2]" \
--var='vm_os=["ubuntu", "debian", "fedora"]'
-```
+terraform apply \
+-var="<key1>=<value1>" \
+-var="<key2>=<value2>"
 
+or
+
+terraform apply \
+-var-file=custom.tfvars
+
+or
+
+terraform apply \
+-var-file=<(cat custom1.tfvars custom2.tfvars)
+# By default terraform.tfvars will be loaded automatically
+```
 *For more available variables, refer to [variables.tf](./variables.tf) definition*
 
 ### Alternatively running in docker
