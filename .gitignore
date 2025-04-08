@@ -1,6 +1,24 @@
+# Local Terraform directories
 **/.terraform/
+
+# State files
+*.tfstate
+*.tfstate.*
+
+# Lock file (optional: uncomment to ignore)
 .terraform.lock.hcl
-terraform.tfstate
-terraform.tfstate.*
-.auto.tfvars
+
+# Plan files
 tfplan
+*.tfplan
+
+# Auto-loaded variables
+*.auto.tfvars
+*.auto.tfvars.json
+
+# Crash logs
+crash.log
+
+# IDE/Editor files
+.idea
+.vscode

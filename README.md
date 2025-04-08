@@ -128,9 +128,10 @@ or
 
 terraform apply \
 -var-file=<(cat custom1.tfvars custom2.tfvars)
-# By default terraform.tfvars will be loaded automatically
 ```
-*For more available variables, refer to [variables.tf](./variables.tf) definition*
+- *Attention please that by default `terraform.tfvars` and `*.auto.tfvars` files will be loaded automatically*
+
+- *For more available variables, refer to [variables.tf](./variables.tf) definition*
 
 ### Alternatively running in docker
 ```bash
