@@ -22,3 +22,6 @@ crash.log
 # IDE/Editor files
 .idea
 .vscode
+
+# Auto generated files
+main.tf

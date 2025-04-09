@@ -20,7 +20,7 @@
 - [About](#about)
 - [Getting Started](#getting_started)
 - [Usage](#usage)
-- [Contributing](../CONTRIBUTING.md)
+- [Contributing](./CONTRIBUTING.md)
 - [Authors](#authors)
 - [Acknowledgments](#acknowledgement)
 
@@ -29,7 +29,7 @@
 This project automates the provisioning of **KVM (Kernel-based Virtual Machine) virtual machines** using Terraform (Infrastructure as Code), supporting multi-OS deployments with flexible networking configurations.
 
 ### Key Features
-- **✅Multi-VM Provisioning**  
+- **✅Multi-VM Provisioning on Multi KVM host**  
   Deploy multiple virtual machines with customized resources (CPU, RAM, disk) in a single operation
 - **✅Cross-OS Support**  
   Simultaneously provision Ubuntu, Debian, Fedora, and other distributions
@@ -47,11 +47,22 @@ These instructions will get you a copy of the project up and running on your loc
 
 ### Prerequisites
 
-`Terraform` is required to install.
-
-1. **Download the Terraform Binary**
+- `j2cli` is required to install and render [main.tf.j2](main.tf.j2) template file.
 ```bash
-wget https://releases.hashicorp.com/terraform/1.6.4/terraform_1.6.4_linux_amd64.zip
+sudo apt install j2cli
+```
+
+- `Terraform` is required to install.
+
+1. **Download Terraform Binary, latest version preferred**
+```bash
+LATEST_VERSION=$(
+curl -s https://api.github.com/repos/hashicorp/terraform/releases/latest \
+| grep tag_name \
+| cut -d '"' -f 4 \
+| sed 's/^v//'
+)
+wget https://releases.hashicorp.com/terraform/${LATEST_VERSION}/terraform_${LATEST_VERSION}_linux_amd64.zip
 ```
 
 2. **Unzip and Install**
@@ -63,7 +74,6 @@ sudo unzip terraform_*.zip -d /usr/local/bin/
 3. **Set Execute Permissions**
 
 ```bash
-
 sudo chmod +x /usr/local/bin/terraform
 
 ```
@@ -71,28 +81,29 @@ sudo chmod +x /usr/local/bin/terraform
 4. **Verify Installation:**
 
 ```bash
-
 terraform --version
-
 ```
 
 ## 🎈 Usage <a name="usage"></a>
 
+### General usage
 ```bash
 git clone https://github.com/easycodesnipper/terraform-kvm-provisioner.git
+
 cd terraform-kvm-provisioner
-terraform init
-```
-### Provision virtual machines on local KVM host
-```bash
-terraform apply
-```
 
+chmod +x terraform-init.sh
 
-### Provision virtual machines on remote KVM host
+export TF_VAR_libvirt_uris='["qemu:///system", "qemu+ssh://<user>@<remote-host>/system"]' 
+# replace placeholders with yours, multiple kvm hosts supported
+# `qemu:///system` format for localhost
+# `qemu+ssh://<kvm_user>@<kvm_host>/system` format for remote host
 
-`Ensure SSH connection works fine between local and remote KVM host`
-```bash
+./terraform-init.sh 
+# This custom initialization script will auto-generated main.tf and install multiple providers and modules.
+
+# If remote KVM host(s) included in `TF_VAR_libvirt_uris`, ensure SSH connection works fine.
+
 # Generate ssh keys
 ssh-keygen
 
@@ -108,30 +119,29 @@ eval $(ssh-agent)
 # Add ssh private key
 ssh-add ~/.ssh/id_rsa
 
-```bash
-terraform apply -var='libvirt_uri="qemu+ssh://<kvm_user>@<kvm_host>:22/system"'
-
+terraform apply
 ```
 
 ### Override available variables
 ```bash
+# Using variables
 terraform apply \
 -var="<key1>=<value1>" \
 -var="<key2>=<value2>"
 
 or
-
+# Using .tfvars file
 terraform apply \
 -var-file=custom.tfvars
 
 or
-
+# Using multiple .tfvars files
 terraform apply \
 -var-file=<(cat custom1.tfvars custom2.tfvars)
 ```
-- *Attention please that by default `terraform.tfvars` and `*.auto.tfvars` files will be loaded automatically*
+- *Attention: By default `terraform.tfvars` and `*.auto.tfvars` files will be automatically loaded*
 
-- *For more available variables, refer to [variables.tf](./variables.tf) definition*
+- *For more variables, refer to [variables.tf](./variables.tf) for definition and [terraform.tfvars](./terraform.tfvars) for usage*
 
 ### Alternatively running in docker
 ```bash
@@ -155,6 +165,4 @@ See also the list of [contributors](https://github.com/easycodesnipper/terraform
 
 ## 🎉 Acknowledgements <a name = "acknowledgement"></a>
 
-- Hat tip to anyone whose code was used
-- Inspiration
 - References

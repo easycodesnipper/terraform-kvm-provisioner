@@ -45,10 +45,9 @@ resource "libvirt_domain" "vm" {
     ]
 
     content {
-      network_name   = network_interface.value.network_name # here network_interface represents local.network_interfaces_map's entry
+      network_name   = network_interface.value.network_name # here `network_interface` represents local.network_interfaces_map's entry
       mac            = network_interface.value.mac_address
       wait_for_lease = true
-      # addresses      = network_interface.value.ipv4_address != null ? [network_interface.value.ipv4_address] : []
     }
   }
 
