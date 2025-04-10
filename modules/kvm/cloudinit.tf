@@ -4,7 +4,7 @@ resource "libvirt_cloudinit_disk" "cloudinit" {
   name = "${each.key}-cloudinit.iso"
   user_data = templatefile("${path.module}/config/user-data.yml.tpl", {
     instance = {
-      hostname      = each.value.hostname
+      hostname      = each.key
       username      = each.value.username
       domain        = each.value.domain != null ? each.value.domain : "local.lan"
       packages      = var.install_packages
