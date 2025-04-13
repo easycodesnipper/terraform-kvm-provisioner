@@ -100,9 +100,9 @@ export TF_VAR_libvirt_uris='["qemu:///system", "qemu+ssh://<user>@<remote-host>/
 # `qemu+ssh://<kvm_user>@<kvm_host>/system` format for remote host
 
 ./terraform-init.sh 
-# This custom initialization script will auto-generated main.tf and install multiple providers and modules.
+# This custom initialization script will auto-generate main.tf and install multiple providers with local modules.
 
-# If remote KVM host(s) included in `TF_VAR_libvirt_uris`, ensure SSH connection works fine.
+# If remote KVM host(s) found in `TF_VAR_libvirt_uris` variable, ensure SSH connection works fine.
 
 # Generate ssh keys
 ssh-keygen
