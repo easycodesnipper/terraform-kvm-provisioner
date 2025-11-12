@@ -9,11 +9,11 @@ users:
     ssh_authorized_keys:
       - ${ssh_public_key}
 %{ if instance.debug_enabled ~}
-    lock_passwd: false # allow password login
+    lock_passwd: false # allow password authtication
 #openssl passwd -6 -salt $(openssl rand -base64 12) <your-text-plain-passwd>
-    hashed_passwd: "$6$M8GwGU4Z9nydjS9k$HU4uarq/2Qcw9I2WIi/2oEvToMuKYUk6Wqk/zh2sjpXwUvtlD7u9iNqY0VpJJZLcm8TAyDJ9xTG4bkCrnOQxj0"
+    hashed_passwd: "$6$tlQKwxyh+3n4gnp7$RUjySOHf84uW2TPrknqKJBmDAHgM1dRpQZW9GlaLe3L2NQaJKStq0kbpkYxFIipOYMY64TqpilHnxMhnAPlLJ1"
 %{ endif ~}
-package_update: true
+package_update: ${package_update}
 package_upgrade: ${package_upgrade}
 packages:
 %{ for package in instance.packages ~}

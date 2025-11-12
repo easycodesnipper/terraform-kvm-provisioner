@@ -2,7 +2,7 @@ resource "libvirt_cloudinit_disk" "cloudinit" {
   for_each = local.vm_instances_map
 
   name = "${each.key}-cloudinit.iso"
-  user_data = templatefile("${path.module}/config/user-data.yml.tpl", {
+  user_data = templatefile("${path.module}/template/user-data.yml.tpl", {
     instance = {
       hostname      = each.key
       username      = each.value.username
@@ -19,18 +19,19 @@ resource "libvirt_cloudinit_disk" "cloudinit" {
       ]
     }
     ssh_public_key  = file(var.ssh_public_key_path)
+    package_update  = var.package_update
     package_upgrade = var.package_upgrade
   })
 
-  network_config = templatefile("${path.module}/config/network-config.yml.tpl", {
+  network_config = templatefile("${path.module}/template/network-config.yml.tpl", {
     interfaces = [
       for nic in values(local.network_interfaces_map) : {
         name         = nic.name
         mac_address  = nic.mac_address
         ipv4_address = nic.ipv4_address
-        cidr_block   = nic.cidr_block
         gateway      = nic.gateway
         dns_servers  = nic.dns_servers
+        metric       = nic.metric
       } if nic.vm_key == each.key
     ]
   })

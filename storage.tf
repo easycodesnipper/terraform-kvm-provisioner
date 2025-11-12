@@ -18,7 +18,7 @@ resource "libvirt_volume" "os_image" {
 resource "libvirt_volume" "os_disk" {
   for_each = local.vm_instances_map
 
-  name           = "${each.key}-os-disk"
+  name           = "${each.key}-os-disk.qcow2"
   pool           = libvirt_pool.pool.name
   base_volume_id = libvirt_volume.os_image[each.key].id
   size           = each.value.storage_spec.os_disk.size_gb * 1073741824
@@ -28,7 +28,7 @@ resource "libvirt_volume" "os_disk" {
 resource "libvirt_volume" "data_disks" {
   for_each = local.data_disks_map
 
-  name   = "${each.value.vm_key}-data-disk-${each.value.disk_index}"
+  name   = "${each.value.vm_key}-data-disk-${each.value.disk_index}.qcow2"
   pool   = libvirt_pool.pool.name
   size   = each.value.size_gb * 1073741824
   format = "qcow2"
