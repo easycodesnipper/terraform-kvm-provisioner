@@ -13,8 +13,8 @@ resource "libvirt_domain" "vm" {
 
   console {
     type        = "pty"
-    target_port = "0"
     target_type = "serial"
+    target_port = "0"
   }
 
   console {
@@ -23,6 +23,7 @@ resource "libvirt_domain" "vm" {
     target_port = "1"
   }
 
+  # Dynamically creates graphics for virtual machines
   dynamic "graphics" {
     for_each = each.value.compute_spec.gpu_enabled ? [1] : []
     content {
@@ -38,6 +39,7 @@ resource "libvirt_domain" "vm" {
 
   autostart = each.value.autostart
 
+  # Dynamically creates network interfaces for virtual machines
   dynamic "network_interface" {
     for_each = [
       for nic in local.network_interfaces_map : nic
@@ -45,7 +47,7 @@ resource "libvirt_domain" "vm" {
     ]
 
     content {
-      network_name   = network_interface.value.network_name # here `network_interface` represents local.network_interfaces_map's entry
+      network_name   = network_interface.value.network_name
       mac            = network_interface.value.mac_address
       wait_for_lease = true
     }
@@ -55,6 +57,7 @@ resource "libvirt_domain" "vm" {
     volume_id = libvirt_volume.os_disk[each.key].id
   }
 
+  # Dynamically creates data disks for virtual machines
   dynamic "disk" {
     for_each = {
       for disk_key, disk in local.data_disks_map : disk_key => disk

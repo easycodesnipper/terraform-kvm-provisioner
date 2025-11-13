@@ -4,7 +4,7 @@ output "vm_network_interfaces" {
   value = {
     for vm_name, vm in libvirt_domain.vm : vm_name => [
       for nic in vm.network_interface : {
-        ip_addresses = nic.addresses[0]
+        ip = nic.addresses[0]
       }
   ] }
 }

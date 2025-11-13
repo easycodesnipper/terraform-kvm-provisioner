@@ -16,54 +16,70 @@ os_images = {
   }
 }
 
+kvm_host = {
+  uri = "qemu:///system"
+  pool = {
+    name = "tf-pool"
+    type = "dir"
+    path = "/tmp/tf-pool"
+  }
+  networks = [
+    {
+      name   = "tf-nat"
+      mode   = "nat"
+      cidr   = ["10.17.3.0/24"]
+      domain = "k8s.local"
+    },
+    {
+      name             = "tf-bridge"
+      mode             = "bridge"
+      bridge_interface = "br0"
+    }
+  ]
+}
+
 vm_instances = {
   k8s-master = {
     count = 1
     profile = {
       domain = "k8s.local"
       compute_spec = {
-        cpu_cores    = 1
-        memory_gb    = 1
-        cpu_mode     = "host-passthrough"
-        architecture = "x86_64"
-        gpu_enabled  = false
+        cpu_cores = 1
+        memory_gb = 1
       }
       storage_spec = {
         os_disk = {
           os_image = "ubuntu2204"
           size_gb  = 20
-          type     = "ssd"
         }
       }
       network_spec = {
         interfaces = [
           {
-            network_name = "nat-network"
+            network_name = "tf-nat"
             name         = "eth0"
+          },
+          {
+            network_name = "tf-bridge"
+            name         = "eth1"
           }
         ]
       }
-      qemu_agent = true
-      autostart  = true
     }
   }
 
   k8s-workers = {
-    count = 3
+    count = 2
     profile = {
       domain = "k8s.local"
       compute_spec = {
-        cpu_cores    = 2
-        memory_gb    = 1
-        cpu_mode     = "host-passthrough"
-        architecture = "x86_64"
-        gpu_enabled  = false
+        cpu_cores = 1
+        memory_gb = 1
       }
       storage_spec = {
         os_disk = {
           os_image = "ubuntu2204"
           size_gb  = 20
-          type     = "ssd"
         }
         data_disks = [
           {
@@ -76,11 +92,11 @@ vm_instances = {
       network_spec = {
         interfaces = [
           {
-            network_name = "nat-network"
+            network_name = "tf-nat"
             name         = "eth0"
           },
           {
-            network_name = "bridge-network"
+            network_name = "tf-bridge"
             name         = "eth1"
           }
         ]

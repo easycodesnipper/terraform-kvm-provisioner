@@ -72,7 +72,7 @@ variable "kvm_host" {
   Default: Creates basic storage pool with NAT and bridge networks
   EOT
   type = object({
-    uri = optional(string, "qemu:///system")
+    uri = string
     pool = object({
       name = optional(string, "default")
       type = optional(string, "dir")
@@ -87,26 +87,6 @@ variable "kvm_host" {
       autostart        = optional(bool, false)
     }))
   })
-  default = {
-    pool = {
-      name = "pool"
-      type = "dir"
-      path = "/tmp/pool"
-    }
-    networks = [
-      {
-        name   = "nat-network"
-        mode   = "nat"
-        cidr   = ["10.17.3.0/24"]
-        domain = "local.lan"
-      },
-      {
-        name             = "bridge-network"
-        mode             = "bridge"
-        bridge_interface = "br0"
-      }
-    ]
-  }
 }
 
 variable "vm_instances" {

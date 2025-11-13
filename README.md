@@ -47,13 +47,7 @@ These instructions will get you a copy of the project up and running on your loc
 
 ### Prerequisites
 
-- `j2cli` is required to install and render [main.tf.j2](main.tf.j2) template file.
-```bash
-sudo apt install j2cli
-```
-
 - `Terraform` is required to install.
-
 1. **Download Terraform Binary, latest version preferred**
 ```bash
 LATEST_VERSION=$(
@@ -91,34 +85,8 @@ terraform --version
 git clone https://github.com/easycodesnipper/terraform-kvm-provisioner.git
 
 cd terraform-kvm-provisioner
-
-chmod +x terraform-init.sh
-
-export TF_VAR_libvirt_uris='["qemu:///system", "qemu+ssh://<user>@<remote-host>/system"]' 
-# replace placeholders with yours, multiple kvm hosts supported
-# `qemu:///system` format for localhost
-# `qemu+ssh://<kvm_user>@<kvm_host>/system` format for remote host
-
-./terraform-init.sh 
-# This custom initialization script will auto-generate main.tf and install multiple providers with local modules.
-
-# If remote KVM host(s) found in `TF_VAR_libvirt_uris` variable, ensure SSH connection works fine.
-
-# Generate ssh keys
-ssh-keygen
-
-# Copy ssh public key to remote
-ssh-copy-id -i ~/.ssh/id_rsa.pub <kvm_user>@<kvm_host>
-
-# Test ssh connection
-ssh <kvm_user>@<kvm_host> hostname
-
-# Start ssh agent
-eval $(ssh-agent)
-
-# Add ssh private key
-ssh-add ~/.ssh/id_rsa
-
+terraform init
+terraform plan
 terraform apply
 ```
 
