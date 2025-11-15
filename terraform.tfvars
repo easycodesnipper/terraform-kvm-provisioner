@@ -5,7 +5,7 @@ os_images = {
     os_type = "linux"
   }
   debian12 = {
-    uri     = "/home/dylan/Downloads/debian-12-backports-genericcloud-amd64.qcow2"
+    uri     = "/home/dylan/Downloads/debian-12-genericcloud-amd64.qcow2"
     format  = "qcow2"
     os_type = "linux"
   }
@@ -38,18 +38,20 @@ kvm_host = {
   ]
 }
 
+use_apt_mirror = true
+
 vm_instances = {
   k8s-master = {
     count = 1
     profile = {
       domain = "k8s.local"
       compute_spec = {
-        cpu_cores = 1
+        cpu_cores = 2
         memory_gb = 1
       }
       storage_spec = {
         os_disk = {
-          os_image = "ubuntu2204"
+          os_image = "debian12"
           size_gb  = 20
         }
       }
@@ -68,17 +70,53 @@ vm_instances = {
     }
   }
 
-  k8s-workers = {
-    count = 2
+  k8s-worker-1 = {
+    count = 1
     profile = {
       domain = "k8s.local"
       compute_spec = {
-        cpu_cores = 1
+        cpu_cores = 2
         memory_gb = 1
       }
       storage_spec = {
         os_disk = {
           os_image = "ubuntu2204"
+          size_gb  = 20
+        }
+        data_disks = [
+          {
+            size_gb     = 30
+            mount_point = "/mnt/data"
+            filesystem  = "ext4"
+          }
+        ]
+      }
+      network_spec = {
+        interfaces = [
+          {
+            network_name = "tf-nat"
+            name         = "eth0"
+          },
+          {
+            network_name = "tf-bridge"
+            name         = "eth1"
+          }
+        ]
+      }
+    }
+  }
+
+  k8s-worker-2 = {
+    count = 1
+    profile = {
+      domain = "k8s.local"
+      compute_spec = {
+        cpu_cores = 2
+        memory_gb = 1
+      }
+      storage_spec = {
+        os_disk = {
+          os_image = "fedora43"
           size_gb  = 20
         }
         data_disks = [

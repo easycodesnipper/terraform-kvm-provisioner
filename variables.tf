@@ -19,7 +19,7 @@ variable "install_packages" {
 variable "package_update" {
   description = "Whether to update packages in cloud init"
   type        = bool
-  default     = false
+  default     = true
 }
 
 variable "package_upgrade" {
@@ -32,6 +32,18 @@ variable "mac_prefix" {
   description = "MAC address prefix"
   type        = list(number)
   default     = [170, 0, 4]
+}
+
+variable "use_apt_mirror" {
+  description = "Whether use APT mirror"
+  type        = bool
+  default     = false
+}
+
+variable "apt_mirror" {
+  description = "APT mirror"
+  type        = string
+  default     = "mirrors.huaweicloud.com"
 }
 
 variable "debug_enabled" {

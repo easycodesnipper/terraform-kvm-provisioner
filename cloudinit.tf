@@ -4,12 +4,18 @@ resource "libvirt_cloudinit_disk" "cloudinit" {
   name = "${each.key}-cloudinit.iso"
   user_data = templatefile("${path.module}/template/user-data.yml.tpl", {
     instance = {
+      debug_enabled = var.debug_enabled
       hostname      = each.key
       username      = each.value.username
       domain        = each.value.domain != null ? each.value.domain : "local.lan"
       packages      = var.install_packages
       timezone      = var.timezone
-      debug_enabled = var.debug_enabled
+      os_family = (
+        can(regex("^(debian)", lower(each.value.os_image))) ? "debian" :
+        can(regex("^(ubuntu)", lower(each.value.os_image))) ? "ubuntu" :
+        can(regex("^(fedora|centos|rhel)", lower(each.value.os_image))) ? "redhat" :
+        "redhat"
+      )
       data_disk_fstab = [
         for data_disk in values(local.data_disks_map) : {
           disk_index  = data_disk.disk_index
@@ -18,6 +24,8 @@ resource "libvirt_cloudinit_disk" "cloudinit" {
         } if data_disk.vm_key == each.key
       ]
     }
+    use_apt_mirror  = var.use_apt_mirror
+    apt_mirror      = var.apt_mirror
     ssh_public_key  = file(var.ssh_public_key_path)
     package_update  = var.package_update
     package_upgrade = var.package_upgrade
