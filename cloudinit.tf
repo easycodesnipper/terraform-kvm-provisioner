@@ -5,7 +5,7 @@ resource "libvirt_cloudinit_disk" "cloudinit" {
   user_data = templatefile("${path.module}/template/user-data.yml.tpl", {
     instance = {
       debug_enabled = var.debug_enabled
-      hostname      = each.key
+      hostname      = each.key # using the instance name as hostname
       username      = each.value.username
       domain        = each.value.domain != null ? each.value.domain : "local.lan"
       packages      = var.install_packages
@@ -24,11 +24,12 @@ resource "libvirt_cloudinit_disk" "cloudinit" {
         } if data_disk.vm_key == each.key
       ]
     }
-    use_apt_mirror  = var.use_apt_mirror
-    apt_mirror      = var.apt_mirror
-    ssh_public_key  = file(var.ssh_public_key_path)
-    package_update  = var.package_update
-    package_upgrade = var.package_upgrade
+    use_apt_mirror   = var.use_apt_mirror
+    apt_mirror       = var.apt_mirror
+    ssh_public_key   = file(var.ssh_public_key_path)
+    package_update   = var.package_update
+    package_upgrade  = var.package_upgrade
+    manage_etc_hosts = var.manage_etc_hosts
   })
 
   network_config = templatefile("${path.module}/template/network-config.yml.tpl", {

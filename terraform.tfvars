@@ -21,24 +21,27 @@ kvm_host = {
   pool = {
     name = "tf-pool"
     type = "dir"
-    path = "/tmp/tf-pool"
+    path = "/mnt/data/tf-pool"
   }
   networks = [
     {
-      name   = "tf-nat"
-      mode   = "nat"
-      cidr   = ["10.17.3.0/24"]
-      domain = "k8s.local"
+      name      = "tf-nat"
+      mode      = "nat"
+      cidr      = ["10.17.3.0/24"]
+      domain    = "k8s.local"
+      autostart = true
     },
     {
       name             = "tf-bridge"
       mode             = "bridge"
       bridge_interface = "br0"
+      autostart        = true
     }
   ]
 }
 
 use_apt_mirror = true
+debug_enabled  = true
 
 vm_instances = {
   k8s-master = {
@@ -60,11 +63,12 @@ vm_instances = {
           {
             network_name = "tf-nat"
             name         = "eth0"
-          },
-          {
-            network_name = "tf-bridge"
-            name         = "eth1"
           }
+          # ,
+          # {
+          #   network_name = "tf-bridge"
+          #   name         = "eth1"
+          # }
         ]
       }
     }
@@ -96,11 +100,12 @@ vm_instances = {
           {
             network_name = "tf-nat"
             name         = "eth0"
-          },
-          {
-            network_name = "tf-bridge"
-            name         = "eth1"
           }
+          # ,
+          # {
+          #   network_name = "tf-bridge"
+          #   name         = "eth1"
+          # }
         ]
       }
     }
@@ -132,11 +137,12 @@ vm_instances = {
           {
             network_name = "tf-nat"
             name         = "eth0"
-          },
-          {
-            network_name = "tf-bridge"
-            name         = "eth1"
           }
+          # ,
+          # {
+          #   network_name = "tf-bridge"
+          #   name         = "eth1"
+          # }
         ]
       }
     }

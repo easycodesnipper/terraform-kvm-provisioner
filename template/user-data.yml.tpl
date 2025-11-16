@@ -1,7 +1,7 @@
 #cloud-config
 hostname: ${instance.hostname}
 fqdn: ${instance.hostname}.${instance.domain}
-manage_etc_hosts: true
+manage_etc_hosts: ${manage_etc_hosts}
 users:
   - name: ${instance.username}
     sudo: ALL=(ALL) NOPASSWD:ALL
@@ -49,6 +49,7 @@ mounts:
 %{ endif }
 runcmd:
   - systemctl enable --now qemu-guest-agent
+  - hostnamectl set-hostname ${instance.hostname}
 %{ if instance.debug_enabled }
 output: { all: '| tee -a /var/log/cloud-init-output.log' }
 %{ endif }

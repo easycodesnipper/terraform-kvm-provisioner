@@ -28,6 +28,12 @@ variable "package_upgrade" {
   default     = false
 }
 
+variable "manage_etc_hosts" {
+  description = "Whether to manage /etc/hosts"
+  type        = bool
+  default     = true
+}
+
 variable "mac_prefix" {
   description = "MAC address prefix"
   type        = list(number)
