@@ -31,7 +31,7 @@ variable "package_upgrade" {
 variable "manage_etc_hosts" {
   description = "Whether to manage /etc/hosts"
   type        = bool
-  default     = true
+  default     = false
 }
 
 variable "mac_prefix" {
@@ -50,6 +50,12 @@ variable "apt_mirror" {
   description = "APT mirror"
   type        = string
   default     = "mirrors.huaweicloud.com"
+}
+
+variable "domain_create_timeouts" {
+  description = "Domain creat timeouts"
+  type        = string
+  default     = "30m"
 }
 
 variable "debug_enabled" {
@@ -141,7 +147,7 @@ variable "vm_instances" {
           ipv4_address = optional(string)
           ipv6_address = optional(string)
           gateway      = optional(string)
-          dns_servers  = optional(list(string))
+          dns_servers  = optional(list(string), ["8.8.8.8", "8.8.4.4"])
         }))
       })
       qemu_agent = optional(bool, true)

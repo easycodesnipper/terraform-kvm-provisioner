@@ -14,6 +14,7 @@ users:
     hashed_passwd: "$6$tlQKwxyh+3n4gnp7$RUjySOHf84uW2TPrknqKJBmDAHgM1dRpQZW9GlaLe3L2NQaJKStq0kbpkYxFIipOYMY64TqpilHnxMhnAPlLJ1"
 %{ endif ~}
 
+# Setup apt mirror
 %{ if instance.os_family == "debian" && use_apt_mirror ~}
 apt:
   primary:
@@ -41,15 +42,68 @@ packages:
   - ${package}
 %{ endfor ~}
 timezone: ${instance.timezone}
+
+runcmd:
+  # Set hostname
+  - hostnamectl set-hostname ${instance.hostname}
+  
+  # Ensure qemu-guest-agent started
+  - |
+    systemctl enable --now qemu-guest-agent
+    # Verify service started successfully with timeout protection
+    max_attempts=30
+    attempt=0
+    until [ "$(systemctl is-active qemu-guest-agent)" = "active" ]; do
+      attempt=$((attempt + 1))
+      if [ $attempt -gt $max_attempts ]; then
+        echo "ERROR: Failed to start qemu-guest-agent after $max_attempts attempts" >&2
+        exit 1
+      fi
+      sleep 2
+      systemctl start qemu-guest-agent
+    done
+
 %{ if length(instance.data_disk_fstab) > 0 }
-mounts:
-%{ for disk in instance.data_disk_fstab ~}
-  - [ "/dev/disk/by-label/data${disk.disk_index + 1}", "${disk.mount_point}", "${disk.filesystem}", "defaults", "0", "0" ]
+  # Add data disks
+%{ for i, disk in instance.data_disk_fstab ~}
+  - |
+    DISK="/dev/vd${substr("bcdefghijklmnopqrstuvwxyz", disk.disk_index, 1)}"
+    PARTITION="$${DISK}1"
+    LABEL="data${disk.disk_index + 1}"
+    MOUNT_POINT="${disk.mount_point}"
+    
+    # Create partition table and partition
+    parted -s "$${DISK}" mklabel gpt mkpart primary 0% 100%
+    
+    # Wait for partition
+    udevadm settle
+    
+    # Verify partition exists before proceeding
+    max_attempts=30
+    attempt=0
+    until [ -b "$${PARTITION}" ]; do
+      attempt=$((attempt + 1))
+      if [ $${attempt} -gt $${max_attempts} ]; then
+        echo "ERROR: Failed to get partition $${PARTITION}" >&2
+        exit 1
+      fi
+      sleep 2
+    done
+    
+    # Create filesystem
+    mkfs.${disk.filesystem} -L "$${LABEL}" "$${PARTITION}"
+    
+    # Create mount point
+    mkdir -p "$${MOUNT_POINT}"
+    
+    # Mount filesystem using the partition device (not by-label)
+    mount "$${PARTITION}" "$${MOUNT_POINT}"
+    
+    # Add to fstab
+    echo "LABEL=$${LABEL} $${MOUNT_POINT} ${disk.filesystem} defaults 0 0" >> /etc/fstab
 %{ endfor ~}
 %{ endif }
-runcmd:
-  - systemctl enable --now qemu-guest-agent
-  - hostnamectl set-hostname ${instance.hostname}
+
 %{ if instance.debug_enabled }
 output: { all: '| tee -a /var/log/cloud-init-output.log' }
 %{ endif }

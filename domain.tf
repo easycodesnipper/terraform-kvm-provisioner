@@ -33,6 +33,10 @@ resource "libvirt_domain" "vm" {
     }
   }
 
+  timeouts {
+    create = var.domain_create_timeouts
+  }
+
   cloudinit = libvirt_cloudinit_disk.cloudinit[each.key].id
 
   qemu_agent = each.value.qemu_agent
@@ -50,6 +54,7 @@ resource "libvirt_domain" "vm" {
       network_name   = network_interface.value.network_name
       mac            = network_interface.value.mac_address
       wait_for_lease = true
+      addresses      = network_interface.value.ipv4_address != null && length(network_interface.value.ipv4_address) > 0 ? [split("/", network_interface.value.ipv4_address)[0]] : null
     }
   }
 

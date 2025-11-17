@@ -11,3 +11,10 @@ output "vm_metadata" {
     }
   }
 }
+
+# output "network_interfaces_flat" {
+#   description = "value"
+#   value = {
+#     nic_flat = local.network_interfaces_flat
+#   }
+# }

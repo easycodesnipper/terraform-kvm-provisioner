@@ -89,8 +89,8 @@ vm_instances = {
         }
         data_disks = [
           {
-            size_gb     = 30
-            mount_point = "/mnt/data"
+            size_gb     = 10
+            mount_point = "/mnt/data1"
             filesystem  = "ext4"
           }
         ]
@@ -126,8 +126,13 @@ vm_instances = {
         }
         data_disks = [
           {
-            size_gb     = 30
-            mount_point = "/mnt/data"
+            size_gb     = 10
+            mount_point = "/mnt/data1"
+            filesystem  = "ext4"
+          },
+          {
+            size_gb     = 10
+            mount_point = "/mnt/data2"
             filesystem  = "ext4"
           }
         ]
@@ -137,6 +142,8 @@ vm_instances = {
           {
             network_name = "tf-nat"
             name         = "eth0"
+            ipv4_address = "10.17.3.6/24"
+            gateway      = "10.17.3.1"
           }
           # ,
           # {
