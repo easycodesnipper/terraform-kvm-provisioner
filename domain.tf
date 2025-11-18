@@ -53,7 +53,7 @@ resource "libvirt_domain" "vm" {
     content {
       network_name   = network_interface.value.network_name
       mac            = network_interface.value.mac_address
-      wait_for_lease = true
+      wait_for_lease = network_interface.value.ipv4_address == null || network_interface.value.ipv4_address == ""
       addresses      = network_interface.value.ipv4_address != null && length(network_interface.value.ipv4_address) > 0 ? [split("/", network_interface.value.ipv4_address)[0]] : null
     }
   }

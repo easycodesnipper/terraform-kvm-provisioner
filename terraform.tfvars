@@ -19,20 +19,20 @@ os_images = {
 kvm_host = {
   uri = "qemu:///system"
   pool = {
-    name = "tf-pool"
+    name = "k8s-pool"
     type = "dir"
-    path = "/mnt/data/tf-pool"
+    path = "/mnt/data/k8s-pool"
   }
   networks = [
     {
-      name      = "tf-nat"
+      name      = "k8s-nat"
       mode      = "nat"
       cidr      = ["10.17.3.0/24"]
       domain    = "k8s.local"
       autostart = true
     },
     {
-      name             = "tf-bridge"
+      name             = "k8s-bridge"
       mode             = "bridge"
       bridge_interface = "br0"
       autostart        = true
@@ -44,7 +44,7 @@ use_apt_mirror = true
 debug_enabled  = true
 
 vm_instances = {
-  k8s-master = {
+  k8s-master-1 = {
     count = 1
     profile = {
       domain = "k8s.local"
@@ -61,12 +61,14 @@ vm_instances = {
       network_spec = {
         interfaces = [
           {
-            network_name = "tf-nat"
+            network_name = "k8s-nat"
             name         = "eth0"
+            ipv4_address = "10.17.3.2/24"
+            gateway      = "10.17.3.1"
           }
           # ,
           # {
-          #   network_name = "tf-bridge"
+          #   network_name = "k8s-bridge"
           #   name         = "eth1"
           # }
         ]
@@ -98,12 +100,14 @@ vm_instances = {
       network_spec = {
         interfaces = [
           {
-            network_name = "tf-nat"
+            network_name = "k8s-nat"
             name         = "eth0"
+            ipv4_address = "10.17.3.3/24"
+            gateway      = "10.17.3.1"
           }
           # ,
           # {
-          #   network_name = "tf-bridge"
+          #   network_name = "k8s-bridge"
           #   name         = "eth1"
           # }
         ]
@@ -140,14 +144,14 @@ vm_instances = {
       network_spec = {
         interfaces = [
           {
-            network_name = "tf-nat"
+            network_name = "k8s-nat"
             name         = "eth0"
-            ipv4_address = "10.17.3.6/24"
+            ipv4_address = "10.17.3.4/24"
             gateway      = "10.17.3.1"
           }
           # ,
           # {
-          #   network_name = "tf-bridge"
+          #   network_name = "k8s-bridge"
           #   name         = "eth1"
           # }
         ]
