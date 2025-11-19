@@ -44,7 +44,7 @@ use_apt_mirror = true
 debug_enabled  = true
 
 vm_instances = {
-  k8s-master-1 = {
+  k8s-controller-1 = {
     count = 1
     profile = {
       domain = "k8s.local"
