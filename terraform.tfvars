@@ -14,6 +14,16 @@ os_images = {
     format  = "qcow2"
     os_type = "linux"
   }
+  centosstream9 = {
+    uri     = "/home/dylan/Downloads/CentOS-Stream-GenericCloud-9-latest.x86_64.qcow2"
+    format  = "qcow2"
+    os_type = "linux"
+  }
+  rockylinux9 = {
+    uri     = "/home/dylan/Downloads/Rocky-9-GenericCloud-Base.latest.x86_64.qcow2"
+    format  = "qcow2"
+    os_type = "linux"
+  }
 }
 
 kvm_host = {
@@ -125,18 +135,13 @@ vm_instances = {
       }
       storage_spec = {
         os_disk = {
-          os_image = "fedora43"
+          os_image = "centosstream9"
           size_gb  = 20
         }
         data_disks = [
           {
             size_gb     = 10
             mount_point = "/mnt/data1"
-            filesystem  = "ext4"
-          },
-          {
-            size_gb     = 10
-            mount_point = "/mnt/data2"
             filesystem  = "ext4"
           }
         ]
