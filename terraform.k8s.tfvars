@@ -1,5 +1,7 @@
+### This example is to provision a kubernetes cluster infrastructure
 os_images = {
   ubuntu2204 = {
+    # adjust with your own image path or using url link
     uri     = "/home/dylan/Downloads/jammy-server-cloudimg-amd64.img"
     format  = "qcow2"
     os_type = "linux"
@@ -60,7 +62,7 @@ vm_instances = {
       domain = "k8s.local"
       compute_spec = {
         cpu_cores = 2
-        memory_gb = 1
+        memory_gb = 2
       }
       storage_spec = {
         os_disk = {
@@ -92,7 +94,7 @@ vm_instances = {
       domain = "k8s.local"
       compute_spec = {
         cpu_cores = 2
-        memory_gb = 1
+        memory_gb = 2
       }
       storage_spec = {
         os_disk = {
@@ -101,7 +103,7 @@ vm_instances = {
         }
         data_disks = [
           {
-            size_gb     = 10
+            size_gb     = 20
             mount_point = "/mnt/data1"
             filesystem  = "ext4"
           }
@@ -131,7 +133,7 @@ vm_instances = {
       domain = "k8s.local"
       compute_spec = {
         cpu_cores = 2
-        memory_gb = 1
+        memory_gb = 2
       }
       storage_spec = {
         os_disk = {
@@ -140,7 +142,7 @@ vm_instances = {
         }
         data_disks = [
           {
-            size_gb     = 10
+            size_gb     = 20
             mount_point = "/mnt/data1"
             filesystem  = "ext4"
           }

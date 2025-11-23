@@ -1,136 +1,56 @@
-<p align="center">
-  <a href="" rel="noopener">
- <img width=200px height=200px src="./images/logo.jpeg" alt="TKP"></a>
-</p>
+# Terraform KVM Provisioner
 
-# Terraform KVM Provisioner (TKP)
-**Terraform(Infrastructure as Code) to provison KVM virtual machines.**
+A flexible Terraform project to provision virtual machines on a KVM host using the `libvirt` provider. This project supports multiple Linux distributions, custom storage pools, network configurations, and cloud-init for automated provisioning.
 
-<div align="center">
+## Features
 
-[![Status](https://img.shields.io/badge/status-active-success.svg)]()
-[![GitHub Issues](https://img.shields.io/github/issues/easycodesnipper/terraform-kvm-provisioner.svg)](https://github.com/easycodesnipper/terraform-kvm-provisioner/issues)
-[![GitHub Pull Requests](https://img.shields.io/github/issues-pr/easycodesnipper/terraform-kvm-provisioner.svg)](https://github.com/easycodesnipper/terraform-kvm-provisioner/pulls)
-[![License](https://img.shields.io/badge/license-MIT-blue.svg)](/LICENSE)
+- **Multi-OS Support**: Easily provision Ubuntu, Debian, Fedora, CentOS, and Rocky Linux VMs.
+- **Flexible Configuration**: Customize CPU, memory, disk size, and network interfaces (supports **Static IP** and **DHCP**) for each VM.
+- **Cloud-Init Integration**: Automates hostname setting, user creation, package installation, and SSH key injection.
+- **Custom Infrastructure**: Manages KVM storage pools and networks (Supports both **NAT** and **Bridge** network modes).
+- **Data Disks**: Support for attaching multiple data disks with automatic formatting and mounting.
 
-</div>
+## Prerequisites
 
-## 📝 Table of Contents
+- **Terraform**: v1.0+
+- **Libvirt/KVM**: A Linux host with KVM and libvirt installed.
+- **Terraform Provider Libvirt**: Will be automatically installed by Terraform.
+- **QEMU Guest Agent**: Recommended for better integration (installed by default in VMs).
 
-- [About](#about)
-- [Getting Started](#getting_started)
-- [Usage](#usage)
-- [Contributing](./CONTRIBUTING.md)
-- [Authors](#authors)
-- [Acknowledgments](#acknowledgement)
+## Usage
 
-## 🧐 About <a name = "about"></a>
+1.  **Clone the repository:**
 
-This project automates the provisioning of **KVM (Kernel-based Virtual Machine) virtual machines** using Terraform (Infrastructure as Code), supporting multi-OS deployments with flexible networking configurations.
+    ```bash
+    git clone <repository-url>
+    cd terraform-kvm-provisioner
+    ```
 
-### Key Features
-- **✅Multi-VM Provisioning on Multi KVM host**  
-  Deploy multiple virtual machines with customized resources (CPU, RAM, disk) in a single operation
-- **✅Cross-OS Support**  
-  Simultaneously provision Ubuntu, Debian, Fedora, and other distributions
-- **✅Dual Networking Modes**  
-  🛡️ **NAT** - Isolated VMs with outbound internet access  
-  🌉 **Bridge** - Direct LAN connectivity for production-like networking
-- **✅Infrastructure as Code**  
-  Version-controlled configurations using Terraform's declarative syntax
-- **✅Cloud-Init Integration**  
-  Automated instance initialization (users, SSH keys, packages)
+2.  **Initialize Terraform:**
 
-## 🏁 Getting Started <a name = "getting_started"></a>
+    ```bash
+    terraform init
+    ```
 
-These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See [usage](#usage) for notes on how to deploy the project on a live system.
+3.  **Configure Variables:**
 
-### Prerequisites
+    Create a `terraform.custom.tfvars` file to customize your deployment. You can use the provided [`terraform.tfvars`](terraform.tfvars) file in this repository as a reference.
 
-- `Terraform` is required to install.
-1. **Download Terraform Binary, latest version preferred**
-```bash
-LATEST_VERSION=$(
-curl -s https://api.github.com/repos/hashicorp/terraform/releases/latest \
-| grep tag_name \
-| cut -d '"' -f 4 \
-| sed 's/^v//'
-)
-wget https://releases.hashicorp.com/terraform/${LATEST_VERSION}/terraform_${LATEST_VERSION}_linux_amd64.zip
-```
+    **Example `terraform.k8s.tfvars`:**
 
-2. **Unzip and Install**
-```bash
-sudo unzip terraform_*.zip -d /usr/local/bin/
+    Please refer to the [`terraform.k8s.tfvars`](terraform.k8s.tfvars) file in this repository for a complete and verified example configuration.
 
-```
+4.  **Plan and Apply:**
 
-3. **Set Execute Permissions**
+    ```bash
+    terraform plan -var-file=terraform.custom.tfvars
+    terraform apply -var-file=terraform.custom.tfvars
+    ```
 
-```bash
-sudo chmod +x /usr/local/bin/terraform
+## Configuration Reference
 
-```
+For a complete list of available variables and their descriptions, please refer to the [`variables.tf`](variables.tf) file.
 
-4. **Verify Installation:**
+## License
 
-```bash
-terraform --version
-```
-
-## 🎈 Usage <a name="usage"></a>
-
-### General usage
-```bash
-git clone https://github.com/easycodesnipper/terraform-kvm-provisioner.git
-
-cd terraform-kvm-provisioner
-terraform init
-terraform plan
-terraform apply
-```
-
-### Override available variables
-```bash
-# Using variables
-terraform apply \
--var="<key1>=<value1>" \
--var="<key2>=<value2>"
-
-or
-# Using .tfvars file
-terraform apply \
--var-file=custom.tfvars
-
-or
-# Using multiple .tfvars files
-terraform apply \
--var-file=<(cat custom1.tfvars custom2.tfvars)
-```
-- *Attention: By default `terraform.tfvars` and `*.auto.tfvars` files will be automatically loaded*
-
-- *For more variables, refer to [variables.tf](./variables.tf) for definition and [terraform.tfvars](./terraform.tfvars) for usage*
-
-### Alternatively running in docker
-```bash
-# Build docker image
-docker build \
---build-arg USER_ID=$(id -u) \
---build-arg GROUP_ID=$(id -g) \
--t terraform-kvm-provisioner .
-
-# Docker run
-docker run -it --rm -v $(pwd):/app \
--v ~/.ssh:/home/tfuser/.ssh \
-terraform-kvm-provisioner apply
-```
-
-## ✍️ Authors <a name = "authors"></a>
-
-- [@easycodesnipper](https://github.com/easycodesnipper) - Idea & Initial work
-
-See also the list of [contributors](https://github.com/easycodesnipper/terraform-kvm-provisioner/contributors) who participated in this project.
-
-## 🎉 Acknowledgements <a name = "acknowledgement"></a>
-
-- References
+[MIT License](LICENSE)
