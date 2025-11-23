@@ -18,6 +18,11 @@ jobs:
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v2
 
+      - name: Install Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libvirt-dev mkisofs
+
       - name: Terraform Format
         run: terraform fmt -check
 

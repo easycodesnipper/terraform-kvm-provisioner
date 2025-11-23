@@ -51,6 +51,14 @@ A flexible Terraform project to provision virtual machines on a KVM host using t
 
 For a complete list of available variables and their descriptions, please refer to the [`variables.tf`](variables.tf) file.
 
+## Local Development
+
+To verify your changes locally before pushing to GitHub, you can use the provided `run_tests.sh` script. This script mimics the checks performed by the GitHub Action workflow.
+
+```bash
+./run_tests.sh
+```
+
 ## License
 
 [MIT License](LICENSE)
