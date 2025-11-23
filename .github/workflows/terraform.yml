@@ -17,11 +17,8 @@ jobs:
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v2
-
-      - name: Install Dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y libvirt-dev mkisofs
+        with:
+          terraform_version: 1.14.0 # adjust with local version
 
       - name: Terraform Version
         run: terraform version
