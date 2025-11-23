@@ -34,7 +34,7 @@ A flexible Terraform project to provision virtual machines on a KVM host using t
 
 3.  **Configure Variables:**
 
-    Create a `terraform.custom.tfvars` file to customize your deployment. You can use the provided [`terraform.tfvars`](terraform.tfvars) file in this repository as a reference.
+    Create a `terraform.custom.tfvars` file to customize your deployment. You can use the provided [`terraform.k8s.tfvars`](terraform.k8s.tfvars) file in this repository as a reference.
 
     **Example `terraform.k8s.tfvars`:**
 
