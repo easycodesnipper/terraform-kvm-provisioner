@@ -23,6 +23,12 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y libvirt-dev mkisofs
 
+      - name: Terraform Version
+        run: terraform version
+
+      - name: Terraform Providers
+        run: terraform providers
+
       - name: Terraform Format
         run: terraform fmt -check
 
