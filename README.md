@@ -22,7 +22,7 @@ A flexible Terraform project to provision virtual machines on a KVM host using t
 1.  **Clone the repository:**
 
     ```bash
-    git clone https://github.com/dylan-wu/terraform-kvm-provisioner.git
+    git clone https://github.com/easycodesnipper/terraform-kvm-provisioner.git
     cd terraform-kvm-provisioner
     ```
 

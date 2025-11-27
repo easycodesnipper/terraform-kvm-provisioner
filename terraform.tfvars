@@ -62,7 +62,7 @@ vm_instances = {
       domain = "k8s.local"
       compute_spec = {
         cpu_cores = 2
-        memory_gb = 2
+        memory_gb = 1
       }
       storage_spec = {
         os_disk = {
@@ -94,7 +94,7 @@ vm_instances = {
       domain = "k8s.local"
       compute_spec = {
         cpu_cores = 2
-        memory_gb = 2
+        memory_gb = 1
       }
       storage_spec = {
         os_disk = {
@@ -133,7 +133,7 @@ vm_instances = {
       domain = "k8s.local"
       compute_spec = {
         cpu_cores = 2
-        memory_gb = 2
+        memory_gb = 1
       }
       storage_spec = {
         os_disk = {
