@@ -29,7 +29,8 @@ os_images = {
 }
 
 kvm_host = {
-  uri = "qemu:///system"
+  uri = "qemu:///system" # local
+  # uri = "qemu+ssh://dylan@192.168.1.100/system" # remote
   pool = {
     name = "k8s-pool"
     type = "dir"

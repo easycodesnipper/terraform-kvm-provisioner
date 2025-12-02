@@ -29,7 +29,8 @@ os_images = {
 }
 
 kvm_host = {
-  uri = "qemu:///system"
+  uri = "qemu:///system" # local
+  # uri = "qemu+ssh://dylan@192.168.1.100/system" # remote
   pool = {
     name = "k8s-pool"
     type = "dir"
@@ -62,7 +63,7 @@ vm_instances = {
       domain = "k8s.local"
       compute_spec = {
         cpu_cores = 2
-        memory_gb = 2
+        memory_gb = 1
       }
       storage_spec = {
         os_disk = {
@@ -94,7 +95,7 @@ vm_instances = {
       domain = "k8s.local"
       compute_spec = {
         cpu_cores = 2
-        memory_gb = 2
+        memory_gb = 1
       }
       storage_spec = {
         os_disk = {
@@ -133,7 +134,7 @@ vm_instances = {
       domain = "k8s.local"
       compute_spec = {
         cpu_cores = 2
-        memory_gb = 2
+        memory_gb = 1
       }
       storage_spec = {
         os_disk = {

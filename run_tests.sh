@@ -10,8 +10,11 @@ fi
 echo "Running Terraform Format Check..."
 terraform fmt -check
 
-echo "Running Terraform Init..."
-terraform init
+echo "Running Terraform Init with upgrade"
+terraform init --upgrade
+
+echo "Running Terraform Version Check..."
+terraform --version
 
 echo "Running Terraform Validate..."
 terraform validate
