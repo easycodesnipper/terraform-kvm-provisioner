@@ -7,11 +7,6 @@ if ! command -v terraform &> /dev/null; then
     exit 1
 fi
 
-if ! command -v mkisofs &> /dev/null; then
-    echo "Warning: mkisofs is not installed. Some provider features might fail."
-    echo "Install it with: sudo apt-get install mkisofs"
-fi
-
 echo "Running Terraform Format Check..."
 terraform fmt -check
 
