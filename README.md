@@ -32,6 +32,26 @@ A flexible Terraform project to provision virtual machines on a KVM host using t
     terraform init
     ```
 
+    # Alternatively approach for terraform init due to network issue
+    ```bash
+    # Download libvirt provider
+    curl -L --retry 3 -O https://github.com/dmacvicar/terraform-provider-libvirt/releases/download/v0.8.3/terraform-provider-libvirt_0.8.3_linux_amd64.zip
+
+    # Download macaddress provider
+    curl -L --retry 3 -O https://github.com/ivoronin/terraform-provider-macaddress/releases/download/v0.3.2/terraform-provider-macaddress_0.3.2_linux_amd64.zip
+
+    mkdir -p terraform.d/plugins/registry.terraform.io/dmacvicar/libvirt/0.8.3/linux_amd64/
+    mkdir -p terraform.d/plugins/registry.terraform.io/ivoronin/macaddress/0.3.2/linux_amd64/
+
+    unzip terraform-provider-libvirt_0.8.3_linux_amd64.zip -d terraform.d/plugins/registry.terraform.io/dmacvicar/libvirt/0.8.3/linux_amd64/
+    unzip terraform-provider-macaddress_0.3.2_linux_amd64.zip -d terraform.d/plugins/registry.terraform.io/ivoronin/macaddress/0.3.2/linux_amd64/
+
+    # Init with local provider
+    terraform init -plugin-dir=./terraform.d/plugins
+
+    rm -rf terraform-provider-*.zip
+    ```  
+
 3.  **Configure Variables:**
 
     Create a `terraform.custom.tfvars` file to customize your deployment. You can use the provided [`terraform.k8s.tfvars`](terraform.k8s.tfvars) file in this repository as a reference.
