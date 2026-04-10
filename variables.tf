@@ -11,9 +11,9 @@ variable "ssh_public_key_path" {
 }
 
 variable "install_packages" {
-  description = "List of additional system packages to install during provisioning"
+  description = "List of additional packages to install during provisioning"
   type        = list(string)
-  default     = ["qemu-guest-agent"]
+  default     = []
 }
 
 variable "package_update" {
@@ -46,7 +46,19 @@ variable "use_apt_mirror" {
   default     = false
 }
 
+variable "use_yum_mirror" {
+  description = "Whether use YUM mirror"
+  type        = bool
+  default     = false
+}
+
 variable "apt_mirror" {
+  description = "APT mirror"
+  type        = string
+  default     = "mirrors.huaweicloud.com"
+}
+
+variable "yum_mirror" {
   description = "APT mirror"
   type        = string
   default     = "mirrors.huaweicloud.com"

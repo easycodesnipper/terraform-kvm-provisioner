@@ -13,8 +13,8 @@ resource "libvirt_cloudinit_disk" "cloudinit" {
       os_family = (
         can(regex("^(debian)", lower(each.value.os_image))) ? "debian" :
         can(regex("^(ubuntu)", lower(each.value.os_image))) ? "ubuntu" :
-        can(regex("^(fedora|centos|rhel)", lower(each.value.os_image))) ? "redhat" :
-        "redhat"
+        can(regex("^(fedora|centos|rhel)", lower(each.value.os_image))) ? "rhel" :
+        "rhel"
       )
       data_disk_fstab = [
         for data_disk in values(local.data_disks_map) : {
@@ -26,6 +26,8 @@ resource "libvirt_cloudinit_disk" "cloudinit" {
     }
     use_apt_mirror   = var.use_apt_mirror
     apt_mirror       = var.apt_mirror
+    use_yum_mirror   = var.use_yum_mirror
+    yum_mirror       = var.yum_mirror
     ssh_public_key   = file(var.ssh_public_key_path)
     package_update   = var.package_update
     package_upgrade  = var.package_upgrade

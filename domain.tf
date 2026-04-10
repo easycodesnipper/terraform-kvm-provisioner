@@ -3,7 +3,7 @@ resource "libvirt_domain" "vm" {
 
   name   = each.key
   vcpu   = each.value.compute_spec.cpu_cores
-  memory = each.value.compute_spec.memory_gb * 1024
+  memory = floor(each.value.compute_spec.memory_gb * 1024)
 
   cpu {
     mode = each.value.compute_spec.cpu_mode

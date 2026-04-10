@@ -30,30 +30,31 @@ os_images = {
 
 kvm_host = {
   uri = "qemu:///system" # local
-  # uri = "qemu+ssh://dylan@192.168.1.100/system" # remote
+  # uri = "qemu+ssh://dylan@192.168.1.100/system" # adjust with your config
   pool = {
     name = "k8s-pool"
     type = "dir"
-    path = "/mnt/data/k8s-pool"
+    path = "/mnt/data/k8s-pool" # adjust with your config
   }
   networks = [
     {
       name      = "k8s-nat"
       mode      = "nat"
-      cidr      = ["10.17.3.0/24"]
+      cidr      = ["10.17.3.0/24"] # adjust with your config
       domain    = "k8s.local"
       autostart = true
     },
     {
       name             = "k8s-bridge"
       mode             = "bridge"
-      bridge_interface = "br0"
+      bridge_interface = "br0" # adjust with your config
       autostart        = true
     }
   ]
 }
 
 use_apt_mirror = true
+use_yum_mirror = true
 debug_enabled  = true
 
 vm_instances = {
@@ -62,8 +63,8 @@ vm_instances = {
     profile = {
       domain = "k8s.local"
       compute_spec = {
-        cpu_cores = 2
-        memory_gb = 1
+        cpu_cores = 1
+        memory_gb = 1.5
       }
       storage_spec = {
         os_disk = {
@@ -94,8 +95,8 @@ vm_instances = {
     profile = {
       domain = "k8s.local"
       compute_spec = {
-        cpu_cores = 2
-        memory_gb = 1
+        cpu_cores = 1
+        memory_gb = 1.5
       }
       storage_spec = {
         os_disk = {
@@ -133,8 +134,8 @@ vm_instances = {
     profile = {
       domain = "k8s.local"
       compute_spec = {
-        cpu_cores = 2
-        memory_gb = 1
+        cpu_cores = 1
+        memory_gb = 1.5
       }
       storage_spec = {
         os_disk = {

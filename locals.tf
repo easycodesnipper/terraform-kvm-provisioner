@@ -3,7 +3,7 @@ locals {
   vm_instances_flat = flatten([
     for config_key, config in var.vm_instances : [
       for instance_idx in range(try(config.count, 1)) : {
-        vm_key         = config.count <= 1 ? "${config_key}" : "${config_key}-${instance_idx}"
+        vm_key         = config.count <= 1 ? config_key : "${config_key}-${instance_idx}"
         config_key     = config_key
         instance_index = instance_idx
         profile        = config.profile
