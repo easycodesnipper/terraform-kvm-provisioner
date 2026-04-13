@@ -70,6 +70,12 @@ variable "domain_create_timeouts" {
   default     = "30m"
 }
 
+variable "password_version" {
+  description = "Version number to force password regeneration. Increment this to create new passwords for all VMs."
+  type        = number
+  default     = 1
+}
+
 variable "debug_enabled" {
   description = "Enable verbose debugging output and preserve temporary resources"
   type        = bool
@@ -132,12 +138,18 @@ variable "vm_instances" {
     profile = object({
       domain   = optional(string, "local.lan")
       username = optional(string, "user")
+      password = optional(string, "changeme")
       compute_spec = object({
         cpu_cores    = optional(number, 1)
         memory_gb    = optional(number, 1)
         cpu_mode     = optional(string, "host-passthrough")
         architecture = optional(string, "x86_64")
-        gpu_enabled  = optional(bool, false)
+        graphics = optional(object({
+          enabled     = optional(bool, false)
+          type        = optional(string, "vnc")
+          listen_type = optional(string, "address")
+          autoport    = optional(bool, true)
+        }), {})
       })
       storage_spec = object({
         os_disk = object({
@@ -152,11 +164,16 @@ variable "vm_instances" {
         })), [])
       })
       network_spec = object({
+        # Group-level IP start for incremental assignment
+        ipv4_address_start = optional(string)                               # e.g., "10.17.3.100"
+        ipv4_prefix_length = optional(number, 24)                           # default /24
+        gateway            = optional(string)                               # default gateway for all interfaces
+        dns_servers        = optional(list(string), ["8.8.8.8", "8.8.4.4"]) # default DNS for all interfaces
         interfaces = list(object({
           network_name = string
           name         = string
           mac_address  = optional(string)
-          ipv4_address = optional(string)
+          ipv4_address = optional(string) # explicit static (overrides start)
           ipv6_address = optional(string)
           gateway      = optional(string)
           dns_servers  = optional(list(string), ["8.8.8.8", "8.8.4.4"])

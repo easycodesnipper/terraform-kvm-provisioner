@@ -1,3 +1,4 @@
+## network-config.yml.tpl
 version: 2
 ethernets:
 %{ for iface in interfaces ~}

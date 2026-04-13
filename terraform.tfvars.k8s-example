@@ -1,7 +1,12 @@
 ### This example is to provision a kubernetes cluster infrastructure
 os_images = {
+  ubuntu2404 = {
+    # uri = "https://cloud-images.ubuntu.com/noble/current/noble-server-cloudimg-amd64.img"
+    uri     = "/home/dylan/Downloads/noble-server-cloudimg-amd64.img" # adjust with yours and url supported too.
+    format  = "qcow2"
+    os_type = "linux"
+  }
   ubuntu2204 = {
-    # adjust with your own image path or using url link
     uri     = "/home/dylan/Downloads/jammy-server-cloudimg-amd64.img"
     format  = "qcow2"
     os_type = "linux"
@@ -30,26 +35,26 @@ os_images = {
 
 kvm_host = {
   uri = "qemu:///system" # local
-  # uri = "qemu+ssh://dylan@192.168.1.100/system" # adjust with your config
+  # uri = "qemu+ssh://dylan@192.168.1.100/system" # adjust with yours
   pool = {
     name = "k8s-pool"
     type = "dir"
-    path = "/mnt/data/k8s-pool" # adjust with your config
+    path = "/mnt/fast/k8s-pool" # adjust with yours
   }
   networks = [
     {
-      name      = "k8s-nat"
+      name      = "k8s-nat" # adjust with yours
       mode      = "nat"
-      cidr      = ["10.17.3.0/24"] # adjust with your config
+      cidr      = ["10.17.3.0/24"] # adjust with yours
       domain    = "k8s.local"
       autostart = true
-    },
-    {
-      name             = "k8s-bridge"
-      mode             = "bridge"
-      bridge_interface = "br0" # adjust with your config
-      autostart        = true
     }
+    # {
+    #   name             = "k8s-bridge" # adjust with yours
+    #   mode             = "bridge"
+    #   bridge_interface = "br0" # adjust with yours
+    #   autostart        = true
+    # }
   ]
 }
 
@@ -57,112 +62,81 @@ use_apt_mirror = true
 use_yum_mirror = true
 debug_enabled  = true
 
+ssh_public_key_path="~/.ssh/id_ed25519.pub"
+
 vm_instances = {
-  k8s-controller-1 = {
+  k8s-controller = {
     count = 1
     profile = {
       domain = "k8s.local"
       compute_spec = {
-        cpu_cores = 1
-        memory_gb = 1.5
-      }
-      storage_spec = {
-        os_disk = {
-          os_image = "debian12"
-          size_gb  = 20
+        cpu_cores = 4
+        memory_gb = 8
+        graphics = { 
+          enabled = true
+          type = "vnc"
         }
       }
-      network_spec = {
-        interfaces = [
-          {
-            network_name = "k8s-nat"
-            name         = "eth0"
-            ipv4_address = "10.17.3.2/24"
-            gateway      = "10.17.3.1"
-          }
-          # ,
-          # {
-          #   network_name = "k8s-bridge"
-          #   name         = "eth1"
-          # }
-        ]
-      }
-    }
-  }
-
-  k8s-worker-1 = {
-    count = 1
-    profile = {
-      domain = "k8s.local"
-      compute_spec = {
-        cpu_cores = 1
-        memory_gb = 1.5
-      }
       storage_spec = {
         os_disk = {
-          os_image = "ubuntu2204"
-          size_gb  = 20
+          os_image = "ubuntu2404"
+          size_gb  = 80
         }
         data_disks = [
           {
-            size_gb     = 20
-            mount_point = "/mnt/data1"
+            size_gb     = 100
+            mount_point = "/var/lib/longhorn" # Added data disk for Longhorn storage
             filesystem  = "ext4"
           }
         ]
       }
       network_spec = {
+        ipv4_address_start = "10.17.3.100"
+        gateway            = "10.17.3.1"
+        dns_servers = ["8.8.8.8", "8.8.4.4"]
         interfaces = [
           {
             network_name = "k8s-nat"
             name         = "eth0"
-            ipv4_address = "10.17.3.3/24"
-            gateway      = "10.17.3.1"
           }
-          # ,
-          # {
-          #   network_name = "k8s-bridge"
-          #   name         = "eth1"
-          # }
         ]
       }
     }
   }
 
-  k8s-worker-2 = {
-    count = 1
+  k8s-worker = {
+    count = 3
     profile = {
       domain = "k8s.local"
       compute_spec = {
-        cpu_cores = 1
-        memory_gb = 1.5
+        cpu_cores = 6
+        memory_gb = 12
+        graphics = { 
+          enabled = true
+          type = "vnc"
+        }
       }
       storage_spec = {
         os_disk = {
-          os_image = "centosstream9"
-          size_gb  = 20
+          os_image = "ubuntu2404"
+          size_gb  = 80
         }
         data_disks = [
           {
-            size_gb     = 20
-            mount_point = "/mnt/data1"
+            size_gb     = 200
+            mount_point = "/var/lib/longhorn"   # Unified Longhorn storage path
             filesystem  = "ext4"
           }
         ]
       }
       network_spec = {
+        ipv4_address_start = "10.17.3.200"
+        gateway            = "10.17.3.1"
         interfaces = [
           {
             network_name = "k8s-nat"
             name         = "eth0"
-            ipv4_address = "10.17.3.4/24"
-            gateway      = "10.17.3.1"
           }
-          # ,
-          # {
-          #   network_name = "k8s-bridge"
-          #   name         = "eth1"
-          # }
         ]
       }
     }

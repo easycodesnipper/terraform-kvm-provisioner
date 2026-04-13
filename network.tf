@@ -1,3 +1,4 @@
+## network.tf
 resource "libvirt_network" "networks" {
   for_each = {
     for net in var.kvm_host.networks : net.name => net

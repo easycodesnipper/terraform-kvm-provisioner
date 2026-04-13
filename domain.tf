@@ -1,3 +1,4 @@
+## domain.tf
 resource "libvirt_domain" "vm" {
   for_each = local.vm_instances_map
 
@@ -25,11 +26,11 @@ resource "libvirt_domain" "vm" {
 
   # Dynamically creates graphics for virtual machines
   dynamic "graphics" {
-    for_each = each.value.compute_spec.gpu_enabled ? [1] : []
+    for_each = try(each.value.compute_spec.graphics.enabled, false) ? [1] : []
     content {
-      type        = "spice"
-      listen_type = "address"
-      autoport    = true
+      type        = try(each.value.compute_spec.graphics.type, "vnc")
+      listen_type = try(each.value.compute_spec.graphics.listen_type, "address")
+      autoport    = try(each.value.compute_spec.graphics.autoport, true)
     }
   }
 

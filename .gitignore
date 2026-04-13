@@ -26,3 +26,6 @@ crash.*.log
 
 # Plugins
 terraform.d
+
+# Degug
+.debug

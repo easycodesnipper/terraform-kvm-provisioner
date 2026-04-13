@@ -10,8 +10,7 @@ users:
       - ${ssh_public_key}
 %{ if instance.debug_enabled ~}
     lock_passwd: false # allow password authtication
-#openssl passwd -6 -salt $(openssl rand -base64 12) <your-text-plain-passwd>
-    hashed_passwd: "$6$tlQKwxyh+3n4gnp7$RUjySOHf84uW2TPrknqKJBmDAHgM1dRpQZW9GlaLe3L2NQaJKStq0kbpkYxFIipOYMY64TqpilHnxMhnAPlLJ1"
+    hashed_passwd: ${instance.hashed_passwd}
 %{ endif ~}
 
 # Setup mirror for diff os family
